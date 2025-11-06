@@ -1,15 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
+from uuid import UUID
 
-# Import schemas, services, and the DB dependency
-from ..schemas.account import AccountCreate, AccountOut, AccountUpdate
+from ..schemas.account import AccountCreate, AccountOut, AccountUpdate, AccountCreateResponse
 from ..services import account as account_service
-# Placeholder for DB dependency, assuming it provides a database session
-from ..db.session import get_db # Define this function in core/db/session.py
+from ..db.session import get_db
 
 router = APIRouter(
-    prefix="/accounts", # Assuming router is mounted under /v1 in main.py
+    prefix="/accounts", 
     tags=["Accounts"],
 )
 
@@ -28,7 +27,7 @@ def read_accounts(
     return accounts
 
 # ----------------- 2. POST: Create New Account -----------------
-@router.post("/", response_model=AccountOut, status_code=status.HTTP_201_CREATED)
+@router.post("/", response_model=AccountCreateResponse, status_code=status.HTTP_201_CREATED)
 def create_new_account(
     account: AccountCreate, 
     db: Session = Depends(get_db)
@@ -49,7 +48,7 @@ def create_new_account(
 # ----------------- 3. GET: Retrieve Single Account -----------------
 @router.get("/{account_id}", response_model=AccountOut)
 def read_account(
-    account_id: int, 
+    account_id: UUID, 
     db: Session = Depends(get_db)
 ):
     """
@@ -63,7 +62,7 @@ def read_account(
 # ----------------- 4. PUT: Update Account -----------------
 @router.put("/{account_id}", response_model=AccountOut)
 def update_existing_account(
-    account_id: int, 
+    account_id: UUID, 
     account: AccountUpdate, 
     db: Session = Depends(get_db)
 ):
@@ -76,9 +75,9 @@ def update_existing_account(
     return db_account
 
 # ----------------- 5. DELETE: Delete Account -----------------
-@router.delete("/{account_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{account_id}", status_code=status.HTTP_200_OK)
 def delete_account_route(
-    account_id: int, 
+    account_id: UUID, 
     db: Session = Depends(get_db)
 ):
     """
