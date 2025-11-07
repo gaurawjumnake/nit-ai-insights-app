@@ -27,7 +27,7 @@ def get_accounts(db: Session, skip: int = 0, limit: int = 100) -> List[Account]:
         func.count(Project.id).label("project_count"),
         func.sum(case((Project.status == 'active', 1), else_=0)).label("active_project_count"),
         func.sum(case((Project.status == 'inactive', 1), else_=0)).label("inactive_project_count"),
-        func.sum(Project.expected_revenue).label("total_revenue"),
+        func.sum(Project.expected_revenue + Project.total_ai_revenue).label("total_revenue"),
         func.sum(Project.total_ai_revenue).label("ai_revenue"),
         func.sum(Project.ai_direct_hours + Project.ai_assist_hours).label("total_ai_hours")
     ).group_by(Project.account_id).subquery()
@@ -74,7 +74,7 @@ def get_account(db: Session, account_id: UUID) -> Optional[Account]:
         func.count(Project.id).label("project_count"),
         func.sum(case((Project.status == 'active', 1), else_=0)).label("active_project_count"),
         func.sum(case((Project.status == 'inactive', 1), else_=0)).label("inactive_project_count"),
-        func.sum(Project.expected_revenue).label("total_revenue"),
+        func.sum(Project.expected_revenue + Project.total_ai_revenue).label("total_revenue"),
         func.sum(Project.total_ai_revenue).label("ai_revenue"),
         func.sum(Project.ai_direct_hours + Project.ai_assist_hours).label("total_ai_hours")
     ).filter(Project.account_id == account_id).group_by(Project.account_id).subquery()
