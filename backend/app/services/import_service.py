@@ -12,24 +12,27 @@ def _scalar(value):
     """Return a clean scalar string/number from potentially messy cell values.
     Handles pandas Series/NaN and lists; returns first non-null trimmed string when possible.
     """
+    if isinstance(value, str):
+        stripped_value = value.strip()
+        return stripped_value if stripped_value else None
     if isinstance(value, pd.Series):
-        # take first non-null
-        for v in value.tolist():
-            if pd.notna(v) and v is not None:
-                value = v
-                break
-        else:
-            return ""
+        for v in value.dropna().tolist():
+            if isinstance(v, str):
+                stripped_v = v.strip()
+                if stripped_v:
+                    return stripped_v
+            elif pd.notna(v):
+                return str(v)
+        return None
     if isinstance(value, (list, tuple)):
         for v in value:
             if pd.notna(v) and v is not None:
-                value = v
-                break
-        else:
-            return ""
-    if isinstance(value, float) and pd.isna(value):
-        return ""
-    return str(value).strip() if value is not None else ""
+                return str(v).strip() if str(v).strip() else None
+        return None
+    if pd.isna(value):
+        return None
+    return str(value).strip() if value is not None else None
+
 from ..schemas.project import ProjectCreate
 
 
@@ -49,6 +52,8 @@ EXPECTED_COLUMNS = [
     "ai_direct_revenue",
     "ai_assisted_revenue",
     "code_coverage_pct",
+    "total_revenue",
+    "project_overview",
 ]
 
 
@@ -59,6 +64,11 @@ def _get_or_create_account(db: Session, row: Dict[str, Any]) -> Account:
 
     account = db.query(Account).filter(Account.name == name).first()
     if account:
+        account.account_manager = _scalar(row.get("account_manager"))
+        account.customer_overview = _scalar(row.get("customer_overview"))
+        account.ai_recommendations = _scalar(row.get("ai_recommendations"))
+        db.add(account)
+        db.flush()
         return account
 
     du_id = _scalar(row.get("delivery_unit_id"))
@@ -102,18 +112,18 @@ def import_accounts_and_projects_from_file(db: Session, content: bytes, filename
         df = pd.read_excel(io.BytesIO(content))
 
     raw_cols = [c.strip().lower().replace(" ", "_") for c in df.columns]
-
     alias_map: Dict[str, str] = {}
     ALIASES = {
-        "account_name": ["account_name", "account", "customer", "customer_name", "account_n"],
+        "account_name": ["account_name", "account", "account_n"],
         "delivery_unit_id": ["delivery_unit_id", "du_id", "delivery_unit_uuid"],
         "delivery_unit_name": ["delivery_unit", "delivery_unit_name", "department", "du", "delivery_u"],
         "account_manager": ["account_manager", "manager"],
-        "customer_overview": ["customer_overview", "customer_", "overview"],
         "ai_recommendations": ["ai_recommendations", "ai_recomm", "recommendations"],
-        "project_name": ["project_name", "project", "project_n", "project name"],
-        "status": ["status"],
         "project_type": ["project_type", "project_ty", "type"],
+        "project_name": ["project_name", "project", "project_n", "project name"],
+        "project_overview": ["project_overview", "project_o", "overview_project", "overview"],
+        "customer_overview": ["customer_overview", "customer_", "overview"],
+        "status": ["status"],
         "expected_revenue": ["expected_revenue", "expected_"],
         "ytd_revenue": ["ytd_revenue", "ytd_reven"],
         "ai_direct_people": ["ai_direct_people", "ai_direct_peo"],
@@ -121,6 +131,7 @@ def import_accounts_and_projects_from_file(db: Session, content: bytes, filename
         "ai_direct_revenue": ["ai_direct_revenue", "ai_direct"],
         "ai_assisted_revenue": ["ai_assisted_revenue", "ai_assiste"],
         "code_coverage_pct": ["code_coverage_pct", "code_covera"],
+        "total_revenue": ["total_revenue", "total_reven","total"],
     }
 
     canonical_cols = {}
@@ -135,25 +146,19 @@ def import_accounts_and_projects_from_file(db: Session, content: bytes, filename
             if matched:
                 break
         if not matched:
-            canonical_cols[col] = col  # keep as-is
+            canonical_cols[col] = col  
 
-    # Apply rename
     rename_dict = {orig: canon for orig, canon in canonical_cols.items() if orig != canon}
     df.columns = raw_cols
     if rename_dict:
         df = df.rename(columns=rename_dict)
-
-    # Handle duplicate canonical names (common when headers are truncated)
-    # Special-case: if two columns became 'account_name', try to map the second to 'account_manager'
+    
     cols = list(df.columns)
     if cols.count("account_name") > 1 and "account_manager" not in cols:
-        # rename the last occurrence to account_manager
         last_idx = [i for i, c in enumerate(cols) if c == "account_name"][-1]
-        # Build a new columns list
         cols[last_idx] = "account_manager"
         df.columns = cols
 
-    # Validate columns subset (not all required, but at least account and project name)
     required_min = {"account_name", "project_name"}
     if not required_min.issubset(set(df.columns)):
         missing = required_min - set(df.columns)
@@ -166,22 +171,22 @@ def import_accounts_and_projects_from_file(db: Session, content: bytes, filename
     for _, row in df.iterrows():
         account = _get_or_create_account(db, row)
         if account.created_at is None:
-            # If Account model has created_at; if not, approximate
             created_accounts += 1
         else:
             updated_accounts += 1
 
         project_name = _scalar(row.get("project_name", ""))
         if not project_name:
-            # Skip if no project in row
             continue
 
-        # Build ProjectCreate
+        raw_project_type = row.get("project_type")
+        scaled_project_type = _scalar(raw_project_type)
         payload = ProjectCreate(
             name=project_name,
             account_id=account.id,
+            overview=_scalar(row.get("project_overview")) or None, 
             status=_scalar(row.get("status", "active")) or "active",
-            project_type=_scalar(row.get("project_type")) or None,
+            project_type=scaled_project_type,
             expected_revenue=float(row.get("expected_revenue", 0) or 0),
             ytd_revenue=float(row.get("ytd_revenue", 0) or 0),
             ai_direct_people=float(row.get("ai_direct_people", 0) or 0),
@@ -189,6 +194,7 @@ def import_accounts_and_projects_from_file(db: Session, content: bytes, filename
             ai_revenue=float(row.get("ai_direct_revenue", 0) or 0),
             ai_assisted_revenue=float(row.get("ai_assisted_revenue", 0) or 0),
             code_coverage_pct=float(row.get("code_coverage_pct", 0) or 0),
+            total_revenue=float(row.get("total_revenue", 0) or 0),
         )
 
         if not dry_run:
@@ -205,5 +211,3 @@ def import_accounts_and_projects_from_file(db: Session, content: bytes, filename
         "created_projects": created_projects,
         "expected_columns": EXPECTED_COLUMNS,
     }
-
-
