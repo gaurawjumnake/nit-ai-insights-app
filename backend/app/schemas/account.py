@@ -1,7 +1,8 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 from pydantic.types import UUID
 from typing import Optional, List
 from datetime import datetime
+from ..schemas.project import ProjectOut
 class AccountBase(BaseModel):
     name: str = Field(..., description="The client account name.")
     delivery_unit_id: UUID = Field(..., description="Foreign key linking to the Delivery Unit.")
@@ -26,22 +27,6 @@ class DeliveryUnitOut(BaseModel):
     class Config:
         from_attributes = True
 
-class ProjectOut(BaseModel):
-    id: UUID
-    name: str
-    status: Optional[str] = None
-    overview: Optional[str] = None
-    expected_revenue: Optional[float] = 0.0
-    total_ai_revenue: Optional[float] = 0.0
-    ai_direct_hours: Optional[float] = 0.0
-    ai_assist_hours: Optional[float] = 0.0
-    ytd_revenue: Optional[float] = None
-    project_type: Optional[str] = None
-    tech_stack: Optional[List[str]] = None
-
-    class Config:
-        from_attributes = True
-
 class AccountOut(AccountBase):
     id: UUID
     created_at: datetime
@@ -49,11 +34,17 @@ class AccountOut(AccountBase):
     project_count: int
     total_revenue: float
     ai_revenue: float
-    ai_penetration_pct: float
     total_ai_hours: float
     active_project_count: int
     inactive_project_count: int
     projects: List[ProjectOut] = []
+
+    @computed_field
+    @property
+    def ai_penetration_pct(self) -> float:
+        if self.total_revenue and self.total_revenue > 0:
+            return (self.ai_revenue / self.total_revenue) * 100
+        return 0.0
 
     class Config:
         from_attributes = True

@@ -24,6 +24,11 @@ def get_projects_by_account(db: Session, account_id: UUID) -> List[Project]:
     return db.query(Project).filter(Project.account_id == str(account_id)).all()
 
 
+def get_project_by_name_and_account_id(db: Session, project_name: str, account_id: UUID) -> Optional[Project]:
+    """Retrieve a single project by name and account ID."""
+    return db.query(Project).filter(Project.name == project_name, Project.account_id == str(account_id)).first()
+
+
 def _sanitize_project_payload(project_dict: dict) -> dict:
     """Coerce incoming payload to the correct types that match the DB schema."""
     from datetime import datetime
@@ -88,6 +93,9 @@ def create_project(db: Session, project_data: ProjectCreate) -> Project:
     """Create a new project."""
     project_dict = project_data.model_dump(exclude_unset=True)
     project_dict = _sanitize_project_payload(project_dict)
+    if project_dict.get("project_type") is None:
+        project_dict.pop("project_type", None)
+
     if 'total_ai_revenue' not in project_dict or project_dict['total_ai_revenue'] == 0:
         ai_direct = project_dict.get('ai_revenue', 0) or 0
         ai_assisted = project_dict.get('ai_assisted_revenue', 0) or 0
@@ -136,4 +144,3 @@ def delete_project(db: Session, project_id: str) -> bool:
         db.commit()
         return True
     return False
-
