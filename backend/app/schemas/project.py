@@ -73,3 +73,20 @@ class ProjectOut(ProjectBase):
     class Config:
         from_attributes = True
 
+
+
+class ProjectSummary(BaseModel):
+    project_id: UUID
+    project_name: str
+    account_id: UUID
+    account_name: str
+    delivery_unit_name: Optional[str]
+    total_expected_rev: float
+    total_ytd_rev: float
+    total_ai_rev: float
+    total_ai_assist_rev: float
+    total_ai_direct_hours: float
+    total_ai_assist_hours: float
+    total_project_count: int
+    month: Optional[int]
+    year: Optional[int]

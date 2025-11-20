@@ -3,9 +3,9 @@ from sqlalchemy.orm import Session
 from typing import List
 from uuid import UUID
 
-from ..schemas.project import ProjectCreate, ProjectUpdate, ProjectOut
-from ..services import project as project_service
-from ..db.session import get_db
+from backend.app.schemas.project import ProjectCreate, ProjectUpdate, ProjectOut
+from backend.app.services import project as project_service
+from backend.app.db.session import get_db
 
 router = APIRouter(
     prefix="/projects",

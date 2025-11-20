@@ -10,10 +10,10 @@ from typing import List, Optional
 import logging
 from uuid import UUID
 
-from ..models.account import Account
-from ..models.delivery_unit import DeliveryUnit
-from ..models.project import Project
-from ..schemas.account import AccountCreate, AccountUpdate
+from backend.app.models.account import Account
+from backend.app.models.delivery_unit import DeliveryUnit
+from backend.app.models.project import Project
+from backend.app.schemas.account import AccountCreate, AccountUpdate
 
 logging.basicConfig(level=logging.DEBUG)
 

@@ -2,13 +2,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String
-from app.api import account as account_api 
-from app.api import delivery_unit as delivery_unit_api
-from app.api import project as project_api
-from app.api import import_data as import_api
-from app.db.base import Base  
-from app.db.session import engine
-from app.models import account, delivery_unit, project 
+from backend.app.api import account as account_api 
+from backend.app.api import delivery_unit as delivery_unit_api
+from backend.app.api import project as project_api
+from backend.app.api import import_data as import_api
+from backend.app.api import data_extractor as sow_extractor_api
+from backend.app.api import dashboard as dashboard_api
+from backend.app.db.base import Base  
+from backend.app.db.session import engine
+from backend.app.models import account, delivery_unit, project 
 
 # def init_db():
 #     """
@@ -30,6 +32,8 @@ app.include_router(account_api.router, prefix="/v1")
 app.include_router(delivery_unit_api.router, prefix="/v1")
 app.include_router(project_api.router, prefix="/v1")
 app.include_router(import_api.router, prefix="/v1")
+app.include_router(sow_extractor_api.router,  prefix="/v1")
+app.include_router(dashboard_api.router,  prefix="/v1")
 
 # Call the function to initialize tables. 
 # init_db()
@@ -45,3 +49,7 @@ app.add_middleware(
     allow_methods=["*"], 
     allow_headers=["*"],  
 )
+
+# if __name__  == "__main__":
+#     import uvicorn
+#     uvicorn.run("main:app", reload=True)

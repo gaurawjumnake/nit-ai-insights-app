@@ -1,0 +1,30 @@
+2025-11-17 18:46:01 | INFO     | __main__:extract_data | Converting pdf file:test_data/Health Companion-Health Insurance Plan_GEN617.pdf
+2025-11-17 18:46:05 | INFO     | __main__:extract_data | File Converted, Starting Summarizer
+2025-11-17 18:46:13 | INFO     | __main__:extract_data | Process Completed, Response generated
+2025-11-17 18:49:08 | INFO     | __main__:extract_data | Converting pdf file:test_data/Health Companion-Health Insurance Plan_GEN617.pdf
+2025-11-17 18:49:14 | INFO     | __main__:extract_data | File Converted, Starting Summarizer
+2025-11-17 18:49:19 | INFO     | __main__:extract_data | Process Completed, Response generated
+2025-11-18 23:32:42 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | Converting pdf file:C:\Users\GAURAW~1.JUM\AppData\Local\Temp\tmpgv3zw3si.pdf
+2025-11-18 23:32:42 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | File Converted, Starting Summarizer
+2025-11-18 23:32:51 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | Process Completed, Response generated
+2025-11-18 23:38:50 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | Converting pdf file:C:\Users\GAURAW~1.JUM\AppData\Local\Temp\tmpvuc9hhim.pdf
+2025-11-18 23:38:50 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | File Converted, Starting Summarizer
+2025-11-18 23:39:02 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | Process Completed, Response generated
+2025-11-18 23:42:24 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | Converting pdf file:C:\Users\GAURAW~1.JUM\AppData\Local\Temp\tmp0ycmx1_r.pdf
+2025-11-18 23:42:24 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | File Converted, Starting Summarizer
+2025-11-18 23:42:32 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | Process Completed, Response generated
+2025-11-19 00:27:26 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | Converting pdf file:C:\Users\GAURAW~1.JUM\AppData\Local\Temp\tmpilwn2ljm.pdf
+2025-11-19 00:27:27 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | File Converted, Starting Summarizer
+2025-11-19 00:27:34 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | Process Completed, Response generated
+2025-11-19 00:28:54 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | Converting pdf file:C:\Users\GAURAW~1.JUM\AppData\Local\Temp\tmpkkre9yud.pdf
+2025-11-19 00:28:55 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | File Converted, Starting Summarizer
+2025-11-19 00:29:02 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | Process Completed, Response generated
+2025-11-19 00:30:17 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | Converting pdf file:C:\Users\GAURAW~1.JUM\AppData\Local\Temp\tmpe1ciljqs.pdf
+2025-11-19 00:30:17 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | File Converted, Starting Summarizer
+2025-11-19 00:30:26 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | Process Completed, Response generated
+2025-11-19 00:34:48 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | Converting pdf file:C:\Users\GAURAW~1.JUM\AppData\Local\Temp\tmp9b_lr8b4.pdf
+2025-11-19 00:34:48 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | File Converted, Starting Summarizer
+2025-11-19 00:34:53 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | Process Completed, Response generated
+2025-11-19 00:36:22 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | Converting pdf file:C:\Users\GAURAW~1.JUM\AppData\Local\Temp\tmprbzdtmjz.pdf
+2025-11-19 00:36:22 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | File Converted, Starting Summarizer
+2025-11-19 00:36:31 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | Process Completed, Response generated

@@ -3,9 +3,9 @@ from sqlalchemy.orm import Session
 from typing import List
 from uuid import UUID
 
-from ..schemas.account import AccountCreate, AccountOut, AccountUpdate, AccountCreateResponse
-from ..services import account as account_service
-from ..db.session import get_db
+from backend.app.schemas.account import AccountCreate, AccountOut, AccountUpdate, AccountCreateResponse
+from backend.app.services import account as account_service
+from backend.app.db.session import get_db
 
 router = APIRouter(
     prefix="/accounts", 
