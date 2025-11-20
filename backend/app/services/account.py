@@ -4,12 +4,6 @@ from typing import List, Optional
 import logging
 from uuid import UUID
 
-from sqlalchemy.orm import Session, joinedload, aliased
-from sqlalchemy import func, case
-from typing import List, Optional
-import logging
-from uuid import UUID
-
 from ..models.account import Account
 from ..models.delivery_unit import DeliveryUnit
 from ..models.project import Project
@@ -18,7 +12,7 @@ from ..schemas.account import AccountCreate, AccountUpdate
 logging.basicConfig(level=logging.DEBUG)
 
 
-def get_accounts(db: Session, skip: int = 0, limit: int = 100) -> List[Account]:
+def get_accounts(db: Session, skip: int = 0, limit: Optional[int] = None) -> List[Account]:
     """
     Retrieve a list of accounts with aggregated project metrics calculated via subqueries.
     """
@@ -50,7 +44,10 @@ def get_accounts(db: Session, skip: int = 0, limit: int = 100) -> List[Account]:
         Account.created_at.desc()
     )
 
-    results = accounts_query.offset(skip).limit(limit).all()
+    if limit is not None:
+        accounts_query = accounts_query.limit(limit)
+    
+    results = accounts_query.offset(skip).all()
 
     accounts_with_metrics = []
     for account, project_count, active_count, inactive_count, total_rev, ai_rev, ai_hours in results:
