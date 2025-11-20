@@ -20,7 +20,7 @@
 from sqlalchemy import Column, String, DateTime, ForeignKey, text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-from app.db.base import Base
+from backend.app.db.base import Base
 from datetime import datetime 
 
 class Account(Base):

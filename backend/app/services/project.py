@@ -2,11 +2,11 @@ from sqlalchemy.orm import Session, joinedload
 from typing import List, Optional
 from uuid import UUID
 
-from ..models.project import Project
+from backend.app.models.project import Project
 from sqlalchemy.exc import IntegrityError
 from uuid import UUID as _UUID
-from ..models.account import Account
-from ..schemas.project import ProjectCreate, ProjectUpdate
+from backend.app.models.account import Account
+from backend.app.schemas.project import ProjectCreate, ProjectUpdate
 
 
 def get_projects(db: Session, skip: int = 0, limit: int = 100) -> List[Project]:

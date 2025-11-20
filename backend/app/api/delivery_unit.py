@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 
-from ..schemas.delivery_unit import DeliveryUnitOut
-from ..services import delivery_unit as delivery_unit_service
-from ..db.session import get_db
+from backend.app.schemas.delivery_unit import DeliveryUnitOut
+from backend.app.services import delivery_unit as delivery_unit_service
+from backend.app.db.session import get_db
 
 router = APIRouter(
     prefix="/delivery_units",

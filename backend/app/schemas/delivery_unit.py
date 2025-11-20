@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from pydantic.types import UUID
+from uuid import UUID
 from datetime import datetime
 
 class DeliveryUnitOut(BaseModel):

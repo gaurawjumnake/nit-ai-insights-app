@@ -1,7 +1,7 @@
 from sqlalchemy import Column, String, DateTime
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-from ..db.base import Base 
+from backend.app.db.base import Base 
 from datetime import datetime
 
 class DeliveryUnit(Base):
