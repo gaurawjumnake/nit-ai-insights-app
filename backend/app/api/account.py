@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 
 from backend.app.schemas.account import AccountCreate, AccountOut, AccountUpdate, AccountCreateResponse
@@ -16,7 +16,7 @@ router = APIRouter(
 @router.get("/", response_model=List[AccountOut])
 def read_accounts(
     skip: int = 0, 
-    limit: int = 100, 
+    limit: Optional[int] = None, 
     db: Session = Depends(get_db)
 ):
     """

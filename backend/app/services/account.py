@@ -18,7 +18,7 @@ from backend.app.schemas.account import AccountCreate, AccountUpdate
 logging.basicConfig(level=logging.DEBUG)
 
 
-def get_accounts(db: Session, skip: int = 0, limit: int = 100) -> List[Account]:
+def get_accounts(db: Session, skip: int = 0, limit: Optional[int] = None) -> List[Account]:
     """
     Retrieve a list of accounts with aggregated project metrics calculated via subqueries.
     """
@@ -27,9 +27,9 @@ def get_accounts(db: Session, skip: int = 0, limit: int = 100) -> List[Account]:
         func.count(Project.id).label("project_count"),
         func.sum(case((Project.status == 'active', 1), else_=0)).label("active_project_count"),
         func.sum(case((Project.status == 'inactive', 1), else_=0)).label("inactive_project_count"),
-        func.sum(Project.expected_revenue + Project.total_ai_revenue).label("total_revenue"),
-        func.sum(Project.total_ai_revenue).label("ai_revenue"),
-        func.sum(Project.ai_direct_hours + Project.ai_assist_hours).label("total_ai_hours")
+        func.sum(Project.__table__.c.total_revenue).label("total_revenue"),
+        func.sum(Project.__table__.c.total_ai_revenue).label("ai_revenue"),
+        func.sum(Project.__table__.c.ai_direct_hours + Project.__table__.c.ai_assist_hours).label("total_ai_hours")
     ).group_by(Project.account_id).subquery()
 
     project_metrics_alias = aliased(project_metrics, name="project_metrics")
@@ -50,7 +50,10 @@ def get_accounts(db: Session, skip: int = 0, limit: int = 100) -> List[Account]:
         Account.created_at.desc()
     )
 
-    results = accounts_query.offset(skip).limit(limit).all()
+    if limit is not None:
+        accounts_query = accounts_query.limit(limit)
+    
+    results = accounts_query.offset(skip).all()
 
     accounts_with_metrics = []
     for account, project_count, active_count, inactive_count, total_rev, ai_rev, ai_hours in results:
@@ -74,9 +77,9 @@ def get_account(db: Session, account_id: UUID) -> Optional[Account]:
         func.count(Project.id).label("project_count"),
         func.sum(case((Project.status == 'active', 1), else_=0)).label("active_project_count"),
         func.sum(case((Project.status == 'inactive', 1), else_=0)).label("inactive_project_count"),
-        func.sum(Project.expected_revenue + Project.total_ai_revenue).label("total_revenue"),
-        func.sum(Project.total_ai_revenue).label("ai_revenue"),
-        func.sum(Project.ai_direct_hours + Project.ai_assist_hours).label("total_ai_hours")
+        func.sum(Project.__table__.c.total_revenue).label("total_revenue"),
+        func.sum(Project.__table__.c.total_ai_revenue).label("ai_revenue"),
+        func.sum(Project.__table__.c.ai_direct_hours + Project.__table__.c.ai_assist_hours).label("total_ai_hours")
     ).filter(Project.account_id == account_id).group_by(Project.account_id).subquery()
 
     metrics = aliased(project_metrics, name="metrics")
