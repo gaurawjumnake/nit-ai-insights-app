@@ -17,7 +17,7 @@
 #     projects = relationship("Project", back_populates="account")
 
 
-from sqlalchemy import Column, String, DateTime, ForeignKey, text
+from sqlalchemy import Column, String, DateTime, ForeignKey, text, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from backend.app.db.base import Base
@@ -28,9 +28,9 @@ class Account(Base):
 
     id = Column(UUID, primary_key=True, index=True, server_default=text("gen_random_uuid()"))
     name = Column(String, index=True, nullable=False)
+    
     customer_overview = Column(String, nullable=True)
     
-    # Links to the delivery_unit table (assuming a table named 'delivery_units')
     delivery_unit_id = Column(UUID, ForeignKey("delivery_units.id"), nullable=False)
     
     delivery_unit = relationship("DeliveryUnit", back_populates="accounts")

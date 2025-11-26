@@ -1,13 +1,9 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, computed_field
 from uuid import UUID
 from typing import Optional, List
 from datetime import datetime
-
-from pydantic import BaseModel, Field, computed_field
-from pydantic.types import UUID
-from typing import Optional, List
-from datetime import datetime
 from ..schemas.project import ProjectOut
+
 class AccountBase(BaseModel):
     name: str = Field(..., description="The client account name.")
     delivery_unit_id: UUID = Field(..., description="Foreign key linking to the Delivery Unit.")

@@ -87,8 +87,8 @@ class ProjectOut(ProjectBase):
 class ProjectSummary(BaseModel):
     project_id: UUID
     project_name: str
-    account_id: UUID
-    account_name: str
+    account_id: Optional[UUID]
+    account_name: Optional[str]
     delivery_unit_name: Optional[str]
     total_expected_rev: float
     total_ytd_rev: float
@@ -99,3 +99,6 @@ class ProjectSummary(BaseModel):
     total_project_count: int
     month: Optional[int]
     year: Optional[int]
+    total_revenue: Optional[float] = 0.0
+    project_status: Optional[str] = None
+    project_type: Optional[str] = None

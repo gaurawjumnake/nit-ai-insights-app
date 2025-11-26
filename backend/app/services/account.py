@@ -25,8 +25,8 @@ def get_accounts(db: Session, skip: int = 0, limit: Optional[int] = None) -> Lis
     project_metrics = db.query(
         Project.account_id,
         func.count(Project.id).label("project_count"),
-        func.sum(case((Project.status == 'active', 1), else_=0)).label("active_project_count"),
-        func.sum(case((Project.status == 'inactive', 1), else_=0)).label("inactive_project_count"),
+        func.sum(case((Project.status.ilike('active'), 1), else_=0)).label("active_project_count"),
+        func.sum(case((Project.status.ilike('inactive'), 1), else_=0)).label("inactive_project_count"),
         func.sum(Project.__table__.c.total_revenue).label("total_revenue"),
         func.sum(Project.__table__.c.total_ai_revenue).label("ai_revenue"),
         func.sum(Project.__table__.c.ai_direct_hours + Project.__table__.c.ai_assist_hours).label("total_ai_hours")
@@ -75,8 +75,8 @@ def get_account(db: Session, account_id: UUID) -> Optional[Account]:
     project_metrics = db.query(
         Project.account_id,
         func.count(Project.id).label("project_count"),
-        func.sum(case((Project.status == 'active', 1), else_=0)).label("active_project_count"),
-        func.sum(case((Project.status == 'inactive', 1), else_=0)).label("inactive_project_count"),
+        func.sum(case((Project.status.ilike('active'), 1), else_=0)).label("active_project_count"),
+        func.sum(case((Project.status.ilike('inactive'), 1), else_=0)).label("inactive_project_count"),
         func.sum(Project.__table__.c.total_revenue).label("total_revenue"),
         func.sum(Project.__table__.c.total_ai_revenue).label("ai_revenue"),
         func.sum(Project.__table__.c.ai_direct_hours + Project.__table__.c.ai_assist_hours).label("total_ai_hours")
