@@ -58,7 +58,7 @@ def read_project(
 ):
     """Retrieve details for a single project by ID."""
     try:
-        db_project = project_service.get_project(db, project_id=project_id)
+        db_project = project_service.get_project(db, project_id=UUID(project_id))
         if db_project is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
         return db_project
@@ -76,7 +76,7 @@ def update_project(
 ):
     """Update an existing project's details."""
     try:
-        db_project = project_service.update_project(db, project_id=project_id, project_data=project)
+        db_project = project_service.update_project(db, project_id=UUID(project_id), project_data=project)
         if db_project is None:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
         return db_project
@@ -94,7 +94,7 @@ def delete_project(
     db: Session = Depends(get_db)
 ):
     """Delete a specific project."""
-    success = project_service.delete_project(db, project_id)
+    success = project_service.delete_project(db, UUID(project_id))
     if not success:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
     return {"message": "Project deleted successfully"}

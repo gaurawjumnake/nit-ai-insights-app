@@ -26,13 +26,11 @@ from datetime import datetime
 class Account(Base):
     __tablename__ = "accounts"
 
-    id = Column(UUID, primary_key=True, index=True, server_default=text("gen_random_uuid()"))
+    id = Column(UUID(as_uuid=True), primary_key=True, index=True, server_default=text("gen_random_uuid()"))
     name = Column(String, index=True, nullable=False)
-    
     customer_overview = Column(String, nullable=True)
-    
-    delivery_unit_id = Column(UUID, ForeignKey("delivery_units.id"), nullable=False)
-    
+    delivery_unit_id = Column(UUID(as_uuid=True), ForeignKey("delivery_units.id"), nullable=False)
+
     delivery_unit = relationship("DeliveryUnit", back_populates="accounts")
     
     ai_recommendations = Column(String, nullable=True)

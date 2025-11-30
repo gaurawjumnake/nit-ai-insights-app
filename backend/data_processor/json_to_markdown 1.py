@@ -1,6 +1,7 @@
 import json
 import argparse
 from pathlib import Path
+from typing import Optional
 
 def convert_to_markdown(data: list) -> str:
     markdown_output = []
@@ -37,7 +38,7 @@ def convert_to_markdown(data: list) -> str:
     final_output = "\n".join(markdown_output)
     return final_output.replace('\n\n\n', '\n\n')
 
-def json_to_md_main(json_data: list, base_file_name: str = None) -> str:
+def json_to_md_main(json_data: list, base_file_name: Optional[str] = None) -> str:
     """
     Converts JSON data (list of parsed document dicts) to a single Markdown string.
     Optionally, it can still save to a .md file if base_file_name is provided,
@@ -69,7 +70,7 @@ if __name__ == "__main__":
             sample_json_data = json.load(f)
         
         print("Converting JSON data to Markdown content...")
-        markdown_output = json_to_md_main(json_data=sample_json_data, base_file_name=output_base_name)
+        markdown_output = json_to_md_main(json_data=sample_json_data, base_file_name=output_base_name) # type:ignore
         
         print("\n--- Markdown Output (first 500 chars) ---")
         print(markdown_output[:500] + "...")
