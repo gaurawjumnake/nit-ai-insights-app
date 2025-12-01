@@ -94,6 +94,7 @@ def get_accounts(db: Session, skip: int = 0, limit: Optional[int] = None) -> Lis
     return accounts_with_metrics
 
 
+
 def get_account(db: Session, account_id: UUID) -> Optional[Account]:
     """    Retrieve a single account by ID with its projects and calculated metrics.    """
     # Project metrics subquery

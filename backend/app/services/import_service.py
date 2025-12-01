@@ -690,6 +690,7 @@ class MasterSummary:
         if delivery_unit_name:
             filters.append(D.name.ilike(f"%{delivery_unit_name}%"))
 
+        # Base query for projects - NO JOIN with RevenueMaster for counting
         base_query = (
             db.query(P)
             .outerjoin(A, P.account_id == A.id)
@@ -697,6 +698,11 @@ class MasterSummary:
             .filter(and_(*filters) if filters else True)  # type:ignore
         )
 
+        total_projects = base_query.distinct().count()
+        active_projects = base_query.filter(P.status.ilike("active")).distinct().count()
+        non_active_projects = total_projects - active_projects
+
+        # Revenue query with proper join
         revenue_query = (
             db.query(R)
             .join(P, R.project_id == P.id)
@@ -708,10 +714,6 @@ class MasterSummary:
         total_accounts = db.query(Account).count()
         active_accounts = total_accounts
         inactive_accounts = 0
-
-        total_projects = base_query.count()
-        active_projects = base_query.filter(P.status.ilike("active")).count()
-        non_active_projects = total_projects - active_projects
 
         total_revenue = self._safe_float(
             revenue_query.with_entities(func.sum(R.total_revenue)).scalar()
@@ -734,8 +736,12 @@ class MasterSummary:
             revenue_query.with_entities(func.sum(R.ai_direct_revenue)).scalar()
         )
 
+        # Project bifurcation should also use distinct count
         project_bifurcation_raw = (
-            base_query.with_entities(P.project_type, func.count(P.id))
+            base_query.with_entities(
+                P.project_type, 
+                func.count(func.distinct(P.id))  # Count distinct project IDs
+            )
             .group_by(P.project_type)
             .all()
         )
@@ -765,7 +771,7 @@ class MasterSummary:
             project_bifurcation=project_bifurcation,
             projects=projects,
         )
-    
+
     def _safe_float(self, value) -> float:
         """Safely convert value to float, handling None and NaN."""
         import math
