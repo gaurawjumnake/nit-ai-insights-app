@@ -24,6 +24,7 @@ class RevenueMaster(Base):
     total_ai_revenue = Column(Numeric)
     total_revenue = Column(Numeric)
     created_at = Column(DateTime, default=datetime.utcnow)
+    collection_date = Column(DateTime)
     
     # Relationships
     project = relationship("Project", back_populates="revenues")

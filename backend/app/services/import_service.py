@@ -1,7 +1,7 @@
 import io
 import pandas as pd
 from sqlalchemy.orm import Session
-from sqlalchemy import func, case, and_
+from sqlalchemy import func, case, and_, or_
 from uuid import uuid4
 from typing import Dict, Any, Optional, List
 from decimal import Decimal
@@ -132,7 +132,7 @@ class ImportProjectData:
         """Create or update revenue record. Returns 'created', 'updated', or 'skipped'."""
         try:
             existing_revenue = db.query(RevenueMaster).filter(
-                RevenueMaster.project_id == project.id
+                RevenueMaster.project_id == project.id,
             ).first()
 
             expected_revenue = float(row.get("expected_revenue", 0) or 0)
@@ -154,6 +154,7 @@ class ImportProjectData:
                 end_date = project.to_date
 
             status = self._scalar(row.get("status", "active")) or "active"
+            collection_date =  "1900-01-01 00:00:00" # type:ignore
 
             if existing_revenue:
                 if not dry_run:
@@ -169,6 +170,7 @@ class ImportProjectData:
                     existing_revenue.from_date = start_date
                     existing_revenue.to_date = end_date
                     existing_revenue.status = status  # type:ignore
+                    existing_revenue.collection_date = collection_date # type:ignore
                     db.add(existing_revenue)
                     db.flush()
                 return "updated"
@@ -188,7 +190,8 @@ class ImportProjectData:
                         total_revenue=total_revenue,
                         from_date=start_date,
                         to_date=end_date,
-                        status=status
+                        status=status,
+                        collection_date = collection_date
                     )
                     db.add(new_revenue)
                     db.flush()
@@ -215,11 +218,9 @@ class ImportProjectData:
         except Exception as e:
             raise ValueError(f"Failed to read file: {str(e)}")
 
-        # Normalize column names
         df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
         print(f"Columns: {list(df.columns)}")
 
-        # Validate required columns
         required = {"project_name", "account_name"}
         if not required.issubset(set(df.columns)):
             missing = required - set(df.columns)
@@ -451,12 +452,12 @@ class ImportRevenueData:
                 skipped_rows += 1
                 continue
 
-            expected_revenue = Decimal(str(row.get("expected_revenue", 0) or 0))
-            ytd_revenue = Decimal(str(row.get("ytd_revenue", 0) or 0))
+            expected_revenue = float(str(row.get("expected_revenue", 0) or 0))
+            ytd_revenue = float(str(row.get("ytd_revenue", 0) or 0))
             ai_direct_people = int(row.get("ai_direct_people", 0) or 0)
             ai_assisted_people = int(row.get("ai_assisted_people", 0) or 0)
-            ai_direct_revenue = Decimal(str(row.get("ai_direct_revenue", 0) or 0))
-            ai_assisted_revenue = Decimal(str(row.get("ai_assisted_revenue", 0) or 0))
+            ai_direct_revenue = float(str(row.get("ai_direct_revenue", 0) or 0))
+            ai_assisted_revenue = float(str(row.get("ai_assisted_revenue", 0) or 0))
 
             total_ai_revenue = ai_direct_revenue + ai_assisted_revenue
             total_revenue = ytd_revenue if ytd_revenue > 0 else expected_revenue
@@ -468,11 +469,19 @@ class ImportRevenueData:
             to_date = pd.to_datetime(row.get("to_date"), errors='coerce') #type:ignore
             if pd.isna(to_date):
                 to_date = None
+            
+            collection_date = pd.to_datetime(row.get("collection_date"), errors='coerce') #type:ignore
+            if pd.isna(collection_date):
+                collection_date = None
 
             status = self._scalar(row.get("status", "active")) or "active"
 
             existing_revenue = db.query(RevenueMaster).filter(
-                RevenueMaster.project_id == project.id
+                RevenueMaster.project_id == project.id,
+                or_(
+                    RevenueMaster.collection_date == collection_date,
+                    RevenueMaster.collection_date.is_(None)
+                    )
             ).first()
 
             if existing_revenue:
@@ -489,6 +498,7 @@ class ImportRevenueData:
                     existing_revenue.from_date = project.from_date #type:ignore
                     existing_revenue.to_date = project.to_date #type:ignore
                     existing_revenue.status = project.status #type:ignore
+                    existing_revenue.collection_date = collection_date #type:ignore
                     db.add(existing_revenue)
                 updated_revenue += 1
             else:
@@ -508,7 +518,8 @@ class ImportRevenueData:
                         total_revenue=total_revenue,
                         from_date=project.from_date,
                         to_date=project.to_date,
-                        status=project.status
+                        status=project.status,
+                        collection_date = collection_date
                     )
                     db.add(new_revenue)
                 created_revenue += 1
@@ -523,19 +534,6 @@ class ImportRevenueData:
             "skipped_rows": skipped_rows,
             "expected_columns": self.EXPECTED_COLUMNS,
         }
-
-from sqlalchemy.orm import Session
-from sqlalchemy import func, case, and_
-from sqlalchemy.schema import MetaData
-from typing import List, Optional
-
-from backend.app.models.project import Project
-from backend.app.models.account import Account
-from backend.app.models.delivery_unit import DeliveryUnit
-from backend.app.models.revenue import RevenueMaster
-from backend.app.schemas.project import ProjectSummary
-from backend.app.schemas.dashboard import DashboardStatsOut
-
 
 class MasterSummary:
     def __init__(self):

@@ -18,6 +18,7 @@ class RevenueBase(BaseModel):
     status: Optional[str] = "active"
     total_ai_revenue: Optional[float] = 0.0
     total_revenue: Optional[float] = 0.0
+    collection_date: Optional[datetime] = None
 
 
 class RevenueCreate(RevenueBase):
@@ -37,6 +38,7 @@ class RevenueUpdate(BaseModel):
     status: Optional[str] = None
     total_ai_revenue: Optional[float] = None
     total_revenue: Optional[float] = None
+    collection_date: Optional[datetime] = None
 
 
 class ProjectOut(BaseModel):
@@ -86,6 +88,8 @@ class RevenueSummary(BaseModel):
     to_date: Optional[datetime] = None
     month: Optional[int] = None
     year: Optional[int] = None
+    collection_date: Optional[datetime] = None
+
     
     @computed_field
     @property
