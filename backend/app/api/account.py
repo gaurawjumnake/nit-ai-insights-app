@@ -6,6 +6,7 @@ from uuid import UUID
 from backend.app.schemas.account import AccountCreate, AccountOut, AccountUpdate, AccountCreateResponse
 from backend.app.services import account as account_service
 from backend.app.db.session import get_db
+from backend.app.services.account import refresh_account_metrics
 
 router = APIRouter(
     prefix="/accounts", 
@@ -87,3 +88,16 @@ def delete_account_route(
     if not success:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Account not found")
     return {"message": "Account deleted successfully"}
+
+@router.post("/refresh-account-metrics")
+def refresh_account_metrics_endpoint(db: Session = Depends(get_db)):
+    """
+    Manually refresh the account metrics materialized view.
+    Should be protected with admin authentication.
+    """
+    result = refresh_account_metrics(db)
+    
+    if result["status"] == "error":
+        raise HTTPException(status_code=500, detail=result["message"])
+    
+    return result

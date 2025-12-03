@@ -17,7 +17,7 @@
 #     projects = relationship("Project", back_populates="account")
 
 
-from sqlalchemy import Column, String, DateTime, ForeignKey, text, Boolean
+from sqlalchemy import Column, String, DateTime, ForeignKey, text, Boolean, Integer, Float
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 from backend.app.db.base import Base
@@ -38,3 +38,19 @@ class Account(Base):
     account_manager = Column(String, nullable=True)
 
     projects = relationship("Project", back_populates="account")
+
+class AccountMetricsMV(Base):
+    __tablename__ = 'account_metrics_mv'
+    
+    account_id = Column(UUID(as_uuid=True), primary_key=True)
+    account_name = Column(String)
+    delivery_unit_id = Column(UUID(as_uuid=True))
+    created_at = Column(DateTime)
+    project_count = Column(Integer)
+    active_project_count = Column(Integer)
+    inactive_project_count = Column(Integer)
+    total_ai_hours = Column(Float)
+    total_revenue = Column(Float)
+    ai_revenue = Column(Float)
+    ai_penetration_pct = Column(Float)
+    has_revenue = Column(Integer)

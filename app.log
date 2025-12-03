@@ -28,3 +28,7 @@
 2025-11-19 00:36:22 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | Converting pdf file:C:\Users\GAURAW~1.JUM\AppData\Local\Temp\tmprbzdtmjz.pdf
 2025-11-19 00:36:22 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | File Converted, Starting Summarizer
 2025-11-19 00:36:31 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | Process Completed, Response generated
+2025-12-02 16:50:47 | INFO     | backend.app.api.dashboard:get_data | Total Projects:- 334
+2025-12-02 16:51:11 | INFO     | backend.app.api.dashboard:get_data | Total Projects:- 334
+2025-12-02 16:53:05 | INFO     | backend.app.api.dashboard:get_data | Total Projects:- 334
+2025-12-02 17:04:49 | INFO     | backend.app.api.dashboard:get_data | Total Projects:- 334

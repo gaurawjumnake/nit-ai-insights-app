@@ -14,6 +14,8 @@ from backend.app.models.delivery_unit import DeliveryUnit
 from backend.app.models.revenue import RevenueMaster
 from backend.app.schemas.project import ProjectSummary
 from backend.app.schemas.dashboard import DashboardStatsOut
+from backend.ai_engine.tools.app_logger import Logger
+log = Logger()
 from backend.app.db.session import get_db, SessionLocal
 from uuid import UUID as _UUID
 import pandas as pd
@@ -268,7 +270,7 @@ class ImportProjectData:
                 project_type = self._scalar(row.get("project_type")) or None
 
                 existing_project = db.query(Project).filter(
-                    Project.name.ilike(project_name),  # Changed from == to .ilike()
+                    Project.name.ilike(project_name), 
                     Project.account_id == account.id
                 ).first()
 
@@ -550,7 +552,8 @@ class MasterSummary:
         year: Optional[int] = None
     ) -> List[ProjectSummary]:
         """
-        Get project level summary with all required fields from ProjectSummary schema.
+        Get project level summary with aggregated revenue data.
+        Each project appears ONCE with all its revenue aggregated.
         """
         P = Project
         A = Account
@@ -580,6 +583,7 @@ class MasterSummary:
         filters_condition = and_(*filters) if filters else True
 
         try:
+            # FIXED: Aggregate revenue data per project using SUM
             project_level_summary = (
                 db.query(
                     P.id.label("project_id"),
@@ -587,16 +591,19 @@ class MasterSummary:
                     P.account_id,
                     A.name.label("account_name"),
                     D.name.label("delivery_unit_name"),
-                    func.coalesce(R.expected_revenue, 0).label("total_expected_rev"),
-                    func.coalesce(R.ytd_revenue, 0).label("total_ytd_rev"),
-                    func.coalesce(R.ai_direct_revenue, 0).label("total_ai_rev"),
-                    func.coalesce(R.ai_assisted_revenue, 0).label("total_ai_assist_rev"),
+                    # Aggregate revenue fields - SUM across all revenue records per project
+                    func.coalesce(func.sum(R.expected_revenue), 0).label("total_expected_rev"),
+                    func.coalesce(func.sum(R.ytd_revenue), 0).label("total_ytd_rev"),
+                    func.coalesce(func.sum(R.ai_direct_revenue), 0).label("total_ai_rev"),
+                    func.coalesce(func.sum(R.ai_assisted_revenue), 0).label("total_ai_assist_rev"),
+                    func.coalesce(func.sum(R.total_revenue), 0).label("total_revenue"),
+                    # Take MAX for people count (assuming it's the same across revenue records)
+                    func.coalesce(func.max(R.ai_direct_people), 0).label("ai_direct_people"),
+                    # Project-level fields (don't need aggregation)
                     func.coalesce(P.ai_direct_hours, 0).label("total_ai_direct_hours"),
                     func.coalesce(P.ai_assist_hours, 0).label("total_ai_assist_hours"),
-                    func.coalesce(R.ai_direct_people, 0).label("ai_direct_people"),
-                    func.coalesce(func.extract('month', P.from_date), None).label("month"),
-                    func.coalesce(func.extract('year', P.from_date), None).label("year"),
-                    func.coalesce(R.total_revenue, 0).label("total_revenue"),
+                    func.extract('month', P.from_date).label("month"),
+                    func.extract('year', P.from_date).label("year"),
                     P.status.label("project_status"),
                     P.project_type.label("project_type"),
                     P.from_date,
@@ -606,6 +613,20 @@ class MasterSummary:
                 .outerjoin(D, A.delivery_unit_id == D.id)
                 .outerjoin(R, P.id == R.project_id)
                 .filter(filters_condition)  # type:ignore
+                .group_by(
+                    P.id,
+                    P.name,
+                    P.account_id,
+                    A.name,
+                    D.name,
+                    P.ai_direct_hours,
+                    P.ai_assist_hours,
+                    P.status,
+                    P.project_type,
+                    P.from_date,
+                    P.to_date
+                )
+                .order_by(P.created_at.desc())
             )
 
             project_level_summary = project_level_summary.all()
@@ -613,7 +634,6 @@ class MasterSummary:
             response = []
             for row in project_level_summary:
                 try:
-
                     total_expected_rev = self._safe_float(row.total_expected_rev)
                     total_ytd_rev = self._safe_float(row.total_ytd_rev)
                     total_ai_rev = self._safe_float(row.total_ai_rev)
@@ -699,6 +719,7 @@ class MasterSummary:
         )
 
         total_projects = base_query.distinct().count()
+        log.log_info(f"Total Projects:- {total_projects}")
         active_projects = base_query.filter(P.status.ilike("active")).distinct().count()
         non_active_projects = total_projects - active_projects
 

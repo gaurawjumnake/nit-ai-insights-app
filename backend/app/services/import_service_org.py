@@ -404,7 +404,7 @@ class MasterSummary:
             if p_type
         ]
 
-        projects = self.get_detailed_project_summary(db, account_name, project_name, project_status, project_type, month, year)
+        projects = self.get_project_level_summary(db, account_name, project_name, project_status, project_type, month, year)
 
         return DashboardStatsOut(
             total_accounts=total_accounts,

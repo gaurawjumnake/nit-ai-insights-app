@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import List
 from uuid import UUID
 
-from backend.app.schemas.project import ProjectCreate, ProjectUpdate, ProjectOut
+from backend.app.schemas.project import ProjectCreate, ProjectUpdate, ProjectOut, ProjectSummary
 from backend.app.services import project as project_service
 from backend.app.db.session import get_db
 
@@ -13,7 +13,7 @@ router = APIRouter(
 )
 
 
-@router.get("/", response_model=List[ProjectOut])
+@router.get("/", response_model=List[ProjectSummary])
 def read_projects(
     skip: int = 0,
     limit: int = 100,
@@ -41,7 +41,7 @@ def create_project(
 
 
 # Keep static route before dynamic route for robustness
-@router.get("/account/{account_id}", response_model=List[ProjectOut])
+@router.get("/account/{account_id}", response_model=List[ProjectSummary])
 def read_projects_by_account(
     account_id: UUID,
     db: Session = Depends(get_db)
@@ -51,7 +51,7 @@ def read_projects_by_account(
     return projects
 
 
-@router.get("/{project_id}", response_model=ProjectOut)
+@router.get("/{project_id}", response_model=ProjectSummary)
 def read_project(
     project_id: str,
     db: Session = Depends(get_db)
