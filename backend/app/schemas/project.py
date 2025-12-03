@@ -58,6 +58,12 @@ class ProjectOut(ProjectBase):
     id: UUID
     created_at: Optional[datetime] = None
     account: Optional[AccountOut] = None
+    expected_revenue: Optional[float] = 0.0
+    ytd_revenue: Optional[float] = 0.0
+    ai_revenue: Optional[float] = 0.0  
+    ai_assisted_revenue: Optional[float] = 0.0
+    total_ai_revenue: Optional[float] = 0.0
+    total_revenue: Optional[float] = 0.0
 
     class Config:
         from_attributes = True
