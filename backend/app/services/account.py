@@ -126,6 +126,24 @@ def get_accounts(db: Session, skip: int = 0, limit: Optional[int] = None) -> Lis
         account.ai_revenue = mv_row.ai_revenue
         account.ai_penetration_pct = mv_row.ai_penetration_pct
         
+        if account.projects:
+            for project in account.projects:
+                revenues = project.revenues
+                if revenues:
+                    project.expected_revenue = sum((r.expected_revenue or 0) for r in revenues)
+                    project.ytd_revenue = sum((r.ytd_revenue or 0) for r in revenues)
+                    project.ai_revenue = sum((r.ai_direct_revenue or 0) for r in revenues)
+                    project.ai_assisted_revenue = sum((r.ai_assisted_revenue or 0) for r in revenues)
+                    project.total_ai_revenue = sum((r.total_ai_revenue or 0) for r in revenues)
+                    project.total_revenue = sum((r.total_revenue or 0) for r in revenues)
+                else:
+                    project.expected_revenue = 0.0
+                    project.ytd_revenue = 0.0
+                    project.ai_revenue = 0.0
+                    project.ai_assisted_revenue = 0.0
+                    project.total_ai_revenue = 0.0
+                    project.total_revenue = 0.0
+        
         accounts_with_metrics.append(account)
     
     return accounts_with_metrics
@@ -135,19 +153,36 @@ def get_account(db: Session, account_id: UUID) -> Optional[Account]:
         Account,
         AccountMetricsMV
     ).outerjoin(
-        AccountMetricsMV,
-        Account.id == AccountMetricsMV.account_id
+        AccountMetricsMV, Account.id == AccountMetricsMV.account_id
     ).options(
         joinedload(Account.delivery_unit),
-        joinedload(Account.projects)
+        joinedload(Account.projects).joinedload(Project.revenues)
     ).filter(
         Account.id == account_id
     ).first()
-    
+
     if not result:
         return None
     
     account, metrics = result
+
+    if account.projects:
+        for project in account.projects:
+            revenues = project.revenues
+            if revenues:
+                project.expected_revenue = sum((r.expected_revenue or 0) for r in revenues)
+                project.ytd_revenue = sum((r.ytd_revenue or 0) for r in revenues)
+                project.ai_revenue = sum((r.ai_direct_revenue or 0) for r in revenues)
+                project.ai_assisted_revenue = sum((r.ai_assisted_revenue or 0) for r in revenues)
+                project.total_ai_revenue = sum((r.total_ai_revenue or 0) for r in revenues)
+                project.total_revenue = sum((r.total_revenue or 0) for r in revenues)
+            else:
+                project.expected_revenue = 0.0
+                project.ytd_revenue = 0.0
+                project.ai_revenue = 0.0
+                project.ai_assisted_revenue = 0.0
+                project.total_ai_revenue = 0.0
+                project.total_revenue = 0.0
 
     if metrics:
         account.project_count = metrics.project_count
