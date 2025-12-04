@@ -51,21 +51,21 @@ def read_projects_by_account(
     return projects
 
 
-@router.get("/{project_id}", response_model=ProjectSummary)
+@router.get("/{project_id}", response_model=ProjectOut)
 def read_project(
     project_id: str,
     db: Session = Depends(get_db)
 ):
     """Retrieve details for a single project by ID."""
     try:
-        db_project = project_service.get_project(db, project_id=UUID(project_id))
-        if db_project is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
-        return db_project
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Failed to fetch project: {str(e)}")
+        project_uuid = UUID(project_id)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid project ID format. Must be a valid UUID.")
+
+    db_project = project_service.get_project(db, project_id=project_uuid)
+    if db_project is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
+    return db_project
 
 
 @router.put("/{project_id}", response_model=ProjectOut)
@@ -74,18 +74,16 @@ def update_project(
     project: ProjectUpdate,
     db: Session = Depends(get_db)
 ):
-    """Update an existing project's details."""
+    """Update an existing project\"s details."""
     try:
-        db_project = project_service.update_project(db, project_id=UUID(project_id), project_data=project)
-        if db_project is None:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
-        return db_project
-    except ValueError as ve:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Failed to update project: {str(e)}")
+        project_uuid = UUID(project_id)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid project ID format. Must be a valid UUID.")
+
+    db_project = project_service.update_project(db, project_id=project_uuid, project_data=project)
+    if db_project is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
+    return db_project
 
 
 @router.delete("/{project_id}", status_code=status.HTTP_200_OK)
@@ -94,10 +92,12 @@ def delete_project(
     db: Session = Depends(get_db)
 ):
     """Delete a specific project."""
-    success = project_service.delete_project(db, UUID(project_id))
+    try:
+        project_uuid = UUID(project_id)
+    except ValueError:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid project ID format. Must be a valid UUID.")
+
+    success = project_service.delete_project(db, project_id=project_uuid)
     if not success:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Project not found")
     return {"message": "Project deleted successfully"}
-
-
-

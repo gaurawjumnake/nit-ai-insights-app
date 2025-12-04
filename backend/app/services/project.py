@@ -121,7 +121,7 @@ def create_project(db: Session, project_data: ProjectCreate) -> Project:
 
 def update_project(db: Session, project_id: UUID, project_data: ProjectUpdate) -> Optional[Project]:
     """Update an existing project by ID."""
-    db_project = get_project(db, project_id)
+    db_project = get_project_2(db, project_id)
     if db_project:
         update_data = project_data.model_dump(exclude_unset=True)
         update_data = _sanitize_project_payload(update_data)
@@ -141,7 +141,7 @@ def update_project(db: Session, project_id: UUID, project_data: ProjectUpdate) -
 
 def delete_project(db: Session, project_id: UUID) -> bool:
     """Delete a project by ID."""
-    db_project = get_project(db, project_id)
+    db_project = get_project_2(db, project_id)
     if db_project:
         db.delete(db_project)
         db.commit()
@@ -245,74 +245,38 @@ def get_projects(
     return project_summaries
 
 
-def get_project(db: Session, project_id: UUID) -> Optional[ProjectSummary]:
-    result = db.query(
-        Project.id.label("project_id"),
-        Project.name.label("project_name"),
-        Project.account_id,
-        Project.status.label("project_status"),
-        Project.project_type,
-        Project.from_date,
-        Project.to_date,
-        Project.ai_direct_hours,
-        Project.ai_assist_hours,
-        Account.name.label("account_name"),
-        DeliveryUnit.name.label("delivery_unit_name"),
-        func.coalesce(func.sum(RevenueMaster.expected_revenue), 0).label("total_expected_rev"),
-        func.coalesce(func.sum(RevenueMaster.ytd_revenue), 0).label("total_ytd_rev"),
-        func.coalesce(func.sum(RevenueMaster.ai_direct_revenue), 0).label("total_ai_rev"),
-        func.coalesce(func.sum(RevenueMaster.ai_assisted_revenue), 0).label("total_ai_assist_rev"),
-        func.coalesce(func.sum(RevenueMaster.total_revenue), 0).label("total_revenue"),
-        func.coalesce(func.max(RevenueMaster.ai_direct_people), 0).label("ai_direct_people"),
-        func.extract('month', Project.from_date).label("month"),
-        func.extract('year', Project.from_date).label("year")
-    ).outerjoin(
-        Account, Project.account_id == Account.id
-    ).outerjoin(
-        DeliveryUnit, Account.delivery_unit_id == DeliveryUnit.id
-    ).outerjoin(
-        RevenueMaster, Project.id == RevenueMaster.project_id
-    ).filter(
-        Project.id == project_id
-    ).group_by(
-        Project.id,
-        Project.name,
-        Project.account_id,
-        Project.status,
-        Project.project_type,
-        Project.from_date,
-        Project.to_date,
-        Project.ai_direct_hours,
-        Project.ai_assist_hours,
-        Account.name,
-        DeliveryUnit.name
-    ).first()
-    
-    if not result:
+def get_project(db: Session, project_id: UUID) -> Optional[Project]:
+    """Retrieve a single project by ID with account relationship and revenue data."""
+    project = get_project_2(db, project_id)
+    if not project:
         return None
     
-    return ProjectSummary(
-        project_id=result.project_id,
-        project_name=result.project_name,
-        account_id=result.account_id,
-        account_name=result.account_name or "",
-        delivery_unit_name=result.delivery_unit_name or "",
-        total_ai_direct_hours=float(result.ai_direct_hours or 0.0),
-        total_ai_assist_hours=float(result.ai_assist_hours or 0.0),
-        # ai_direct_people=int(result.ai_direct_people or 0),
-        project_status=result.project_status or "active",
-        project_type=result.project_type or "",
-        from_date=result.from_date,
-        to_date=result.to_date,
-        total_expected_rev=float(result.total_expected_rev),
-        total_ytd_rev=float(result.total_ytd_rev),
-        total_ai_rev=float(result.total_ai_rev),
-        total_ai_assist_rev=float(result.total_ai_assist_rev),
-        total_revenue=float(result.total_revenue),
-        total_project_count=1,
-        month=int(result.month) if result.month else None,
-        year=int(result.year) if result.year else None,
-    )
+    revenue_data = db.query(
+        func.coalesce(func.sum(RevenueMaster.expected_revenue), 0).label("expected_revenue"),
+        func.coalesce(func.sum(RevenueMaster.ytd_revenue), 0).label("ytd_revenue"),
+        func.coalesce(func.sum(RevenueMaster.ai_direct_revenue), 0).label("ai_revenue"),
+        func.coalesce(func.sum(RevenueMaster.ai_assisted_revenue), 0).label("ai_assisted_revenue"),
+        func.coalesce(func.sum(RevenueMaster.total_revenue), 0).label("total_revenue"),
+    ).filter(
+        RevenueMaster.project_id == project_id
+    ).first()
+    
+    if revenue_data:
+        project.expected_revenue = float(revenue_data.expected_revenue or 0)
+        project.ytd_revenue = float(revenue_data.ytd_revenue or 0)
+        project.ai_revenue = float(revenue_data.ai_revenue or 0)
+        project.ai_assisted_revenue = float(revenue_data.ai_assisted_revenue or 0)
+        project.total_revenue = float(revenue_data.total_revenue or 0)
+        project.total_ai_revenue = project.ai_revenue + project.ai_assisted_revenue
+    else:
+        project.expected_revenue = 0.0
+        project.ytd_revenue = 0.0
+        project.ai_revenue = 0.0
+        project.ai_assisted_revenue = 0.0
+        project.total_revenue = 0.0
+        project.total_ai_revenue = 0.0
+    
+    return project
 
 
 def get_projects_by_account(
