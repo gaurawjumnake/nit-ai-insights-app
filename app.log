@@ -28,3 +28,14 @@
 2025-11-19 00:36:22 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | Converting pdf file:C:\Users\GAURAW~1.JUM\AppData\Local\Temp\tmprbzdtmjz.pdf
 2025-11-19 00:36:22 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | File Converted, Starting Summarizer
 2025-11-19 00:36:31 | INFO     | backend.ai_engine.ai_data_extractor:extract_data | Process Completed, Response generated
+2025-12-02 16:50:47 | INFO     | backend.app.api.dashboard:get_data | Total Projects:- 334
+2025-12-02 16:51:11 | INFO     | backend.app.api.dashboard:get_data | Total Projects:- 334
+2025-12-02 16:53:05 | INFO     | backend.app.api.dashboard:get_data | Total Projects:- 334
+2025-12-02 17:04:49 | INFO     | backend.app.api.dashboard:get_data | Total Projects:- 334
+2025-12-05 16:51:04 | ERROR    | contextlib:__exit__ | Error while connecting db- 400: Failed to import: ImportRevenueData.import_revenue_from_file() missing 2 required positional arguments: 'content' and 'filename'
+2025-12-05 16:51:04 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-05 16:56:31 | ERROR    | contextlib:__exit__ | Error while connecting db- 400: Failed to import: ImportRevenueData.import_revenue_from_file() got multiple values for argument 'db'
+2025-12-05 16:56:31 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-05 17:06:51 | ERROR    | contextlib:__exit__ | Error while connecting db- 400: Failed to import: ImportRevenueData.import_revenue_from_file() got multiple values for argument 'db'
+2025-12-05 17:06:51 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-05 17:10:33 | DEBUG    | contextlib:__exit__ | Closeing DB Connection

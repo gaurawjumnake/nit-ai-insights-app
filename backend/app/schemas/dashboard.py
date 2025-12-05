@@ -1,10 +1,11 @@
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, computed_field
 from uuid import UUID
 
 from backend.app.schemas.project import ProjectSummary
 
 class DashboardStatsOut(BaseModel):
+    """Dashboard statistics with project and revenue metrics."""
     total_accounts: int
     active_accounts: int
     inactive_accounts: int
@@ -18,3 +19,18 @@ class DashboardStatsOut(BaseModel):
     total_ai_direct_revenue: float
     project_bifurcation: List[dict]
     projects: List[ProjectSummary]
+    delivery_unit_name: Optional[str] = None
+    
+    @computed_field
+    @property
+    def total_ai_revenue(self) -> float:
+        """Calculate total AI revenue (direct + assisted)."""
+        return self.total_ai_direct_revenue + self.total_ai_assisted_revenue
+    
+    @computed_field
+    @property
+    def ai_penetration_pct(self) -> float:
+        """Calculate AI revenue penetration percentage."""
+        if self.total_revenue and self.total_revenue > 0:
+            return (self.total_ai_revenue / self.total_revenue) * 100
+        return 0.0

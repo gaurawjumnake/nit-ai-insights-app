@@ -45,37 +45,37 @@ class LlamaCloudDocumentParser:
             use_vendor_multimodal_model=True,
             vendor_multimodal_model_name="openai-gpt4o",
             system_prompt="""
-You are an expert document parser using vision capabilities. Analyze each page image and extract:
+                You are an expert document parser using vision capabilities. Analyze each page image and extract:
 
-1.  **Text Content**: All visible text with proper hierarchy and formatting
-2.  **Visual Elements**: Detailed descriptions of images, charts, diagrams, graphs, and visual layouts
-3.  **Tables**: Complete table data with headers, structure, and formatting
-4.  **Contextual Information**: Relationships between text and visuals
+                1.  **Text Content**: All visible text with proper hierarchy and formatting
+                2.  **Visual Elements**: Detailed descriptions of images, charts, diagrams, graphs, and visual layouts
+                3.  **Tables**: Complete table data with headers, structure, and formatting
+                4.  **Contextual Information**: Relationships between text and visuals
 
-For presentations (PPTX slides):
-- Identify slide titles, subtitles, and content hierarchy
-- Describe slide layouts and visual themes
-- Extract all bullet points and text blocks
-- Describe charts, graphs, images, and their context
-- Note slide transitions and visual flow
+                For presentations (PPTX slides):
+                - Identify slide titles, subtitles, and content hierarchy
+                - Describe slide layouts and visual themes
+                - Extract all bullet points and text blocks
+                - Describe charts, graphs, images, and their context
+                - Note slide transitions and visual flow
 
-For documents with charts/graphs:
-- Describe chart types (bar, line, pie, etc.)
-- Extract data values and labels where visible
-- Explain trends and patterns shown
+                For documents with charts/graphs:
+                - Describe chart types (bar, line, pie, etc.)
+                - Extract data values and labels where visible
+                - Explain trends and patterns shown
 
-For spreadsheets:
-- Extract visible cell data and formatting
-- Describe chart elements and data visualizations
-- Note conditional formatting and visual cues
+                For spreadsheets:
+                - Extract visible cell data and formatting
+                - Describe chart elements and data visualizations
+                - Note conditional formatting and visual cues
 
-Format output in clear Markdown with appropriate headers and structure.
+                Format output in clear Markdown with appropriate headers and structure.
 
-**IMPORTANT FINAL RULE:**
-Your output must ONLY be the clean Markdown representation of the page's content.
-While performing the analysis requested above, **DO NOT** create your own headers like "## Visual Elements", "## Design Elements", or "## Contextual Information" in the final text.
-Instead, integrate your findings naturally. For example, represent visuals using Markdown image syntax: `![A concise description of the chart or image.]`. Your output should be a direct, clean transcription of the document.
-"""
+                **IMPORTANT FINAL RULE:**
+                Your output must ONLY be the clean Markdown representation of the page's content.
+                While performing the analysis requested above, **DO NOT** create your own headers like "## Visual Elements", "## Design Elements", or "## Contextual Information" in the final text.
+                Instead, integrate your findings naturally. For example, represent visuals using Markdown image syntax: `![A concise description of the chart or image.]`. Your output should be a direct, clean transcription of the document.
+                """
         )
         self.results = []
     
