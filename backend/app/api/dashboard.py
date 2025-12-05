@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import Optional, List
 from sqlalchemy import func, and_, Table, MetaData
 from backend.app.db.session import get_db
-from backend.app.services.import_service import MasterSummary
+from backend.app.services.dashboard_services import MasterSummary
 from backend.app.schemas.dashboard import DashboardStatsOut
 from backend.app.schemas.project import ProjectSummary
 

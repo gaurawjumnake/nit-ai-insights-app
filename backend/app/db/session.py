@@ -4,8 +4,18 @@ from sqlalchemy.orm import sessionmaker
 from backend.app.core.config import settings
 import os
 import psycopg2
+from backend.ai_engine.tools.app_logger import Logger
+log = Logger()
 
-engine = create_engine(f"{settings.DATABASE_URL}")
+engine = create_engine(
+    settings.DATABASE_URL,
+    pool_pre_ping=True,
+    pool_recycle=180,
+    pool_size=5,
+    max_overflow=2,
+    pool_timeout=10,
+    connect_args={"connect_timeout": 5})
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
@@ -13,7 +23,13 @@ def get_db():
     db = SessionLocal()
     try:
         yield db
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        log.log_error(f"Error while connecting db- {e}")
+        raise
     finally:
+        log.log_debug(f"Closeing DB Connection")
         db.close()
 
 
