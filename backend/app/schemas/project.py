@@ -25,7 +25,14 @@ class ProjectBase(BaseModel):
 
 
 class ProjectCreate(ProjectBase):
-    pass
+    expected_revenue: Optional[float] = 0.0
+    ytd_revenue: Optional[float] = 0.0
+    ai_revenue: Optional[float] = 0.0
+    ai_assisted_revenue: Optional[float] = 0.0
+    ai_direct_people: Optional[int] = 0
+    ai_assisted_people: Optional[int] = 0
+    total_ai_revenue: Optional[float] = 0.0
+    total_revenue: Optional[float] = 0.0
 
 
 class ProjectUpdate(BaseModel):
@@ -44,6 +51,14 @@ class ProjectUpdate(BaseModel):
     expected_win_date: Optional[datetime] = None
     expected_outcome: Optional[str] = None
     code_coverage_pct: Optional[float] = None
+    expected_revenue: Optional[float] = None
+    ytd_revenue: Optional[float] = None
+    ai_revenue: Optional[float] = None
+    ai_assisted_revenue: Optional[float] = None
+    ai_direct_people: Optional[int] = None
+    ai_assisted_people: Optional[int] = None
+    total_ai_revenue: Optional[float] = None
+    total_revenue: Optional[float] = None
 
 
 class AccountOut(BaseModel):
@@ -64,6 +79,16 @@ class ProjectOut(ProjectBase):
     ai_assisted_revenue: Optional[float] = 0.0
     total_ai_revenue: Optional[float] = 0.0
     total_revenue: Optional[float] = 0.0
+    
+    @computed_field
+    @property
+    def ai_penetration(self) -> float:
+        """AI revenue as a percentage of total revenue."""
+        total_rev = self.total_revenue or 0
+        ai_total = (self.ai_revenue or 0) + (self.ai_assisted_revenue or 0)
+        if total_rev > 0 and ai_total > 0:
+            return (ai_total / total_rev) * 100
+        return 0.0
 
     class Config:
         from_attributes = True
@@ -96,7 +121,8 @@ class ProjectSummary(BaseModel):
     @property
     def ai_penetration(self) -> float:
         """Calculate AI revenue penetration percentage."""
-        if self.total_revenue and self.total_revenue > 0:
-            total_ai = self.total_ai_rev + self.total_ai_assist_rev
-            return (total_ai / self.total_revenue) * 100
+        total_rev = self.total_revenue or 0
+        total_ai = (self.total_ai_rev or 0) + (self.total_ai_assist_rev or 0)
+        if total_rev > 0 and total_ai > 0:
+            return (total_ai / total_rev) * 100
         return 0.0

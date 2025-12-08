@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session, joinedload, aliased
 from sqlalchemy import func, case, text
+from math import isfinite
 from typing import List, Optional
 import logging
 from uuid import UUID
@@ -11,6 +12,19 @@ from backend.app.models.revenue import RevenueMaster
 from backend.app.schemas.account import AccountCreate, AccountUpdate
 
 logging.basicConfig(level=logging.DEBUG)
+
+
+def _safe_float(value, default: float = 0.0) -> float:
+    """
+    Normalize database numeric values to JSON-safe floats.
+    Converts None/NaN/inf to default (0.0 by default).
+    """
+    try:
+        val = float(value)
+    except (TypeError, ValueError):
+        return default
+
+    return val if isfinite(val) else default
 
 
 def get_accounts_2(db: Session, skip: int = 0, limit: Optional[int] = None) -> List[Account]:
@@ -69,25 +83,14 @@ def get_accounts_2(db: Session, skip: int = 0, limit: Optional[int] = None) -> L
         account.project_count = project_count or 0
         account.active_project_count = active_count or 0
         account.inactive_project_count = inactive_count or 0
-        ai_hours_val = ai_hours or 0.0
-        if isinstance(ai_hours_val, float) and (ai_hours_val != ai_hours_val):  
-            ai_hours_val = 0.0
-        account.total_ai_hours = ai_hours_val
-
-        total_rev_val = float(total_rev) if total_rev else 0.0
-        if total_rev_val != total_rev_val:  
-            total_rev_val = 0.0
-        account.total_revenue = total_rev_val
-        
-        ai_rev_val = float(ai_rev) if ai_rev else 0.0
-        if ai_rev_val != ai_rev_val: 
-            ai_rev_val = 0.0
-        account.ai_revenue = ai_rev_val
-
-        if account.total_revenue > 0:
-            account.ai_penetration_pct = (account.ai_revenue / account.total_revenue * 100)
-        else:
-            account.ai_penetration_pct = 0.0
+        account.total_ai_hours = _safe_float(ai_hours)
+        account.total_revenue = _safe_float(total_rev)
+        account.ai_revenue = _safe_float(ai_rev)
+        account.ai_penetration_pct = (
+            (account.ai_revenue / account.total_revenue * 100)
+            if account.total_revenue > 0 and account.ai_revenue > 0
+            else 0.0
+        )
             
         accounts_with_metrics.append(account)
 
@@ -118,24 +121,24 @@ def get_accounts(db: Session, skip: int = 0, limit: Optional[int] = None) -> Lis
     accounts_with_metrics = []
     for mv_row, account, delivery_unit in results:
         account.delivery_unit = delivery_unit
-        account.project_count = mv_row.project_count
-        account.active_project_count = mv_row.active_project_count
-        account.inactive_project_count = mv_row.inactive_project_count
-        account.total_ai_hours = mv_row.total_ai_hours
-        account.total_revenue = mv_row.total_revenue
-        account.ai_revenue = mv_row.ai_revenue
-        account.ai_penetration_pct = mv_row.ai_penetration_pct
+        account.project_count = mv_row.project_count or 0
+        account.active_project_count = mv_row.active_project_count or 0
+        account.inactive_project_count = mv_row.inactive_project_count or 0
+        account.total_ai_hours = _safe_float(mv_row.total_ai_hours)
+        account.total_revenue = _safe_float(mv_row.total_revenue)
+        account.ai_revenue = _safe_float(mv_row.ai_revenue)
+        account.ai_penetration_pct = _safe_float(mv_row.ai_penetration_pct)
         
         if account.projects:
             for project in account.projects:
                 revenues = project.revenues
                 if revenues:
-                    project.expected_revenue = sum((r.expected_revenue or 0) for r in revenues)
-                    project.ytd_revenue = sum((r.ytd_revenue or 0) for r in revenues)
-                    project.ai_revenue = sum((r.ai_direct_revenue or 0) for r in revenues)
-                    project.ai_assisted_revenue = sum((r.ai_assisted_revenue or 0) for r in revenues)
-                    project.total_ai_revenue = sum((r.total_ai_revenue or 0) for r in revenues)
-                    project.total_revenue = sum((r.total_revenue or 0) for r in revenues)
+                    project.expected_revenue = _safe_float(sum((r.expected_revenue or 0) for r in revenues))
+                    project.ytd_revenue = _safe_float(sum((r.ytd_revenue or 0) for r in revenues))
+                    project.ai_revenue = _safe_float(sum((r.ai_direct_revenue or 0) for r in revenues))
+                    project.ai_assisted_revenue = _safe_float(sum((r.ai_assisted_revenue or 0) for r in revenues))
+                    project.total_ai_revenue = _safe_float(sum((r.total_ai_revenue or 0) for r in revenues))
+                    project.total_revenue = _safe_float(sum((r.total_revenue or 0) for r in revenues))
                 else:
                     project.expected_revenue = 0.0
                     project.ytd_revenue = 0.0
@@ -170,12 +173,12 @@ def get_account(db: Session, account_id: UUID) -> Optional[Account]:
         for project in account.projects:
             revenues = project.revenues
             if revenues:
-                project.expected_revenue = sum((r.expected_revenue or 0) for r in revenues)
-                project.ytd_revenue = sum((r.ytd_revenue or 0) for r in revenues)
-                project.ai_revenue = sum((r.ai_direct_revenue or 0) for r in revenues)
-                project.ai_assisted_revenue = sum((r.ai_assisted_revenue or 0) for r in revenues)
-                project.total_ai_revenue = sum((r.total_ai_revenue or 0) for r in revenues)
-                project.total_revenue = sum((r.total_revenue or 0) for r in revenues)
+                project.expected_revenue = _safe_float(sum((r.expected_revenue or 0) for r in revenues))
+                project.ytd_revenue = _safe_float(sum((r.ytd_revenue or 0) for r in revenues))
+                project.ai_revenue = _safe_float(sum((r.ai_direct_revenue or 0) for r in revenues))
+                project.ai_assisted_revenue = _safe_float(sum((r.ai_assisted_revenue or 0) for r in revenues))
+                project.total_ai_revenue = _safe_float(sum((r.total_ai_revenue or 0) for r in revenues))
+                project.total_revenue = _safe_float(sum((r.total_revenue or 0) for r in revenues))
             else:
                 project.expected_revenue = 0.0
                 project.ytd_revenue = 0.0
@@ -185,13 +188,13 @@ def get_account(db: Session, account_id: UUID) -> Optional[Account]:
                 project.total_revenue = 0.0
 
     if metrics:
-        account.project_count = metrics.project_count
-        account.active_project_count = metrics.active_project_count
-        account.inactive_project_count = metrics.inactive_project_count
-        account.total_ai_hours = metrics.total_ai_hours
-        account.total_revenue = metrics.total_revenue
-        account.ai_revenue = metrics.ai_revenue
-        account.ai_penetration_pct = metrics.ai_penetration_pct
+        account.project_count = metrics.project_count or 0
+        account.active_project_count = metrics.active_project_count or 0
+        account.inactive_project_count = metrics.inactive_project_count or 0
+        account.total_ai_hours = _safe_float(metrics.total_ai_hours)
+        account.total_revenue = _safe_float(metrics.total_revenue)
+        account.ai_revenue = _safe_float(metrics.ai_revenue)
+        account.ai_penetration_pct = _safe_float(metrics.ai_penetration_pct)
     else:
         account.project_count = 0
         account.active_project_count = 0

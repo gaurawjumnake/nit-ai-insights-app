@@ -3,7 +3,7 @@ from typing import List, Optional
 from uuid import UUID
 from uuid import UUID as _UUID
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import func, and_, extract
+from sqlalchemy import func, and_, extract, text
 
 from backend.app.models.project import Project
 from backend.app.models.account import Account
@@ -104,7 +104,22 @@ def create_project(db: Session, project_data: ProjectCreate) -> Project:
     project_dict = project_data.model_dump(exclude_unset=True)
     project_dict = _sanitize_project_payload(project_dict)
     
-    # Remove project_type if None
+    revenue_fields = {
+        "expected_revenue": project_dict.pop("expected_revenue", 0.0),
+        "ytd_revenue": project_dict.pop("ytd_revenue", 0.0),
+        "ai_direct_revenue": project_dict.pop("ai_revenue", 0.0),
+        "ai_assisted_revenue": project_dict.pop("ai_assisted_revenue", 0.0),
+        "ai_direct_people": project_dict.pop("ai_direct_people", 0),
+        "ai_assisted_people": project_dict.pop("ai_assisted_people", 0),
+        "total_ai_revenue": project_dict.pop("total_ai_revenue", 0.0),
+        "total_revenue": project_dict.pop("total_revenue", 0.0),
+    }
+
+    if not revenue_fields["total_revenue"]:
+        revenue_fields["total_revenue"] = (
+            revenue_fields["ytd_revenue"] or revenue_fields["expected_revenue"]
+        )
+
     if project_dict.get("project_type") is None:
         project_dict.pop("project_type", None)
     
@@ -116,6 +131,37 @@ def create_project(db: Session, project_data: ProjectCreate) -> Project:
         db.rollback()
         raise ValueError("Invalid project payload: ensure account_id exists and types are valid") from e
     db.refresh(db_project)
+
+    revenue_entry = RevenueMaster(
+        project_id=db_project.id,
+        project_name=db_project.name,
+        expected_revenue=revenue_fields["expected_revenue"],
+        ytd_revenue=revenue_fields["ytd_revenue"],
+        ai_direct_revenue=revenue_fields["ai_direct_revenue"],
+        ai_assisted_revenue=revenue_fields["ai_assisted_revenue"],
+        ai_direct_people=revenue_fields["ai_direct_people"],
+        ai_assisted_people=revenue_fields["ai_assisted_people"],
+        total_ai_revenue=revenue_fields["total_ai_revenue"],
+        total_revenue=revenue_fields["total_revenue"], 
+        status=db_project.status,
+        from_date=db_project.from_date,
+        to_date=db_project.to_date
+    )
+    db.add(revenue_entry)
+    db.commit()
+    db_project.expected_revenue = revenue_fields["expected_revenue"]
+    db_project.ytd_revenue = revenue_fields["ytd_revenue"]
+    db_project.ai_revenue = revenue_fields["ai_direct_revenue"]
+    db_project.ai_assisted_revenue = revenue_fields["ai_assisted_revenue"]
+    db_project.total_ai_revenue = revenue_fields["total_ai_revenue"]
+    db_project.total_revenue = revenue_fields["total_revenue"]
+
+    try:
+        db.execute(text("SELECT refresh_account_metrics_mv();"))
+        db.commit()
+    except Exception:
+        db.rollback()
+
     return db_project
 
 
@@ -126,15 +172,72 @@ def update_project(db: Session, project_id: UUID, project_data: ProjectUpdate) -
         update_data = project_data.model_dump(exclude_unset=True)
         update_data = _sanitize_project_payload(update_data)
         
+        
+        revenue_updates = {}
+        for field in [
+            "expected_revenue", "ytd_revenue", "ai_direct_people", 
+            "ai_assisted_people", "total_ai_revenue", "total_revenue"
+        ]:
+            if field in update_data:
+                revenue_updates[field] = update_data.pop(field)
+        
+        if "ai_revenue" in update_data:
+            revenue_updates["ai_direct_revenue"] = update_data.pop("ai_revenue")
+            
+        if "ai_assisted_revenue" in update_data:
+            revenue_updates["ai_assisted_revenue"] = update_data.pop("ai_assisted_revenue")
+
         for key, value in update_data.items():
             setattr(db_project, key, value)
         
+        if revenue_updates:
+            revenue_entry = db.query(RevenueMaster).filter(RevenueMaster.project_id == project_id).first()
+            if revenue_entry:
+                for key, value in revenue_updates.items():
+                    setattr(revenue_entry, key, value)
+                if "expected_revenue" in revenue_updates:
+                     pass
+            else:
+                revenue_entry = RevenueMaster(
+                    project_id=db_project.id,
+                    project_name=db_project.name,
+                    expected_revenue=revenue_updates.get("expected_revenue", 0.0),
+                    ytd_revenue=revenue_updates.get("ytd_revenue", 0.0),
+                    ai_direct_revenue=revenue_updates.get("ai_direct_revenue", 0.0),
+                    ai_assisted_revenue=revenue_updates.get("ai_assisted_revenue", 0.0),
+                    ai_direct_people=revenue_updates.get("ai_direct_people", 0),
+                    ai_assisted_people=revenue_updates.get("ai_assisted_people", 0),
+                    total_ai_revenue=revenue_updates.get("total_ai_revenue", 0.0),
+                    total_revenue=revenue_updates.get("total_revenue", 0.0),
+                    status=db_project.status,
+                    from_date=db_project.from_date,
+                    to_date=db_project.to_date
+                )
+                db.add(revenue_entry)
+
         try:
             db.commit()
         except IntegrityError as e:
             db.rollback()
             raise ValueError("Invalid update: foreign key or data type issue") from e
+        
         db.refresh(db_project)
+        
+        revenue_entry = db.query(RevenueMaster).filter(RevenueMaster.project_id == project_id).first()
+        if revenue_entry:
+            db_project.expected_revenue = float(revenue_entry.expected_revenue or 0)
+            db_project.ytd_revenue = float(revenue_entry.ytd_revenue or 0)
+            db_project.ai_revenue = float(revenue_entry.ai_direct_revenue or 0)
+            db_project.ai_assisted_revenue = float(revenue_entry.ai_assisted_revenue or 0)
+            db_project.total_ai_revenue = float(revenue_entry.total_ai_revenue or 0)
+            db_project.total_revenue = float(revenue_entry.total_revenue or 0)
+
+        try:
+            db.execute(text("SELECT refresh_account_metrics_mv();"))
+            db.commit()
+        except Exception:
+            db.rollback()
+
         return db_project
     return None
 
@@ -142,11 +245,20 @@ def update_project(db: Session, project_id: UUID, project_data: ProjectUpdate) -
 def delete_project(db: Session, project_id: UUID) -> bool:
     """Delete a project by ID."""
     db_project = get_project_2(db, project_id)
-    if db_project:
-        db.delete(db_project)
+    if not db_project:
+        return False
+
+    db.query(RevenueMaster).filter(RevenueMaster.project_id == project_id).delete(synchronize_session=False)
+    db.delete(db_project)
+    db.commit()
+
+    try:
+        db.execute(text("SELECT refresh_account_metrics_mv();"))
         db.commit()
-        return True
-    return False
+    except Exception:
+        db.rollback()
+
+    return True
 
 def get_projects(
     db: Session, 
@@ -214,7 +326,7 @@ def get_projects(
         Project.created_at.desc()
     )
 
-    results = query.all() # offset(skip).limit(limit)
+    results = query.all() 
 
     project_summaries = []
     for row in results:
@@ -275,6 +387,11 @@ def get_project(db: Session, project_id: UUID) -> Optional[Project]:
         project.ai_assisted_revenue = 0.0
         project.total_revenue = 0.0
         project.total_ai_revenue = 0.0
+
+    if project.total_revenue and project.total_revenue > 0:
+        project.ai_penetration = (project.total_ai_revenue / project.total_revenue) * 100
+    else:
+        project.ai_penetration = 0.0
     
     return project
 

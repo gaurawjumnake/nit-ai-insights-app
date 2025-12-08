@@ -4,12 +4,22 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, case, and_, or_
 from uuid import uuid4
 from typing import Dict, Any, Optional, List
+from decimal import Decimal
 from backend.ai_engine.tools.app_logger import Logger
 log = Logger()
+from backend.app.services.project import create_project
 from backend.app.models.account import Account
 from backend.app.models.project import Project
 from backend.app.models.delivery_unit import DeliveryUnit
 from backend.app.models.revenue import RevenueMaster
+from backend.app.schemas.project import ProjectSummary
+from backend.app.schemas.dashboard import DashboardStatsOut
+from backend.ai_engine.tools.app_logger import Logger
+log = Logger()
+from backend.app.db.session import get_db, SessionLocal
+from uuid import UUID as _UUID
+import pandas as pd
+from sqlalchemy import MetaData, Table, select, insert
 
 class ImportProjectData:
     def __init__(self) -> None:
@@ -135,7 +145,15 @@ class ImportProjectData:
             ai_assisted_revenue = float(row.get("ai_assisted_revenue", 0) or 0)
             
             total_ai_revenue = ai_revenue + ai_assisted_revenue
-            total_revenue = ytd_revenue if ytd_revenue > 0 else expected_revenue
+            
+            file_total_revenue = row.get("total_revenue")
+            if file_total_revenue is not None and str(file_total_revenue).strip():
+                try:
+                    total_revenue = float(str(file_total_revenue))
+                except ValueError:
+                    total_revenue = ytd_revenue if ytd_revenue > 0 else expected_revenue
+            else:
+                total_revenue = ytd_revenue if ytd_revenue > 0 else expected_revenue
             
             start_date = pd.to_datetime(row.get("start_date"), errors='coerce') # type:ignore
             if pd.isna(start_date):
@@ -396,7 +414,8 @@ class ImportRevenueData:
             "ai_assisted_revenue": ["ai_assisted_revenue", "ai_assiste_r", "ai_assisted"],
             "from_date": ["from_date", "start_date", "start"],
             "to_date": ["to_date", "end_date", "end"],
-            "status": ["status"]
+            "status": ["status"],
+            "total_revenue": ["total_revenue", "total_rev", "total"]
         }
 
         canonical_cols = {}
@@ -450,9 +469,14 @@ class ImportRevenueData:
             ai_assisted_people = int(row.get("ai_assisted_people", 0) or 0)
             ai_direct_revenue = float(str(row.get("ai_direct_revenue", 0) or 0))
             ai_assisted_revenue = float(str(row.get("ai_assisted_revenue", 0) or 0))
-
+            
             total_ai_revenue = ai_direct_revenue + ai_assisted_revenue
-            total_revenue = ytd_revenue if ytd_revenue > 0 else expected_revenue
+            
+            file_total_revenue = row.get("total_revenue")
+            if file_total_revenue is not None and str(file_total_revenue).strip():
+                total_revenue = float(str(file_total_revenue))
+            else:
+                total_revenue = ytd_revenue if ytd_revenue > 0 else expected_revenue
 
             from_date = pd.to_datetime(row.get("from_date"), errors='coerce') #type:ignore
             if pd.isna(from_date):
@@ -527,6 +551,283 @@ class ImportRevenueData:
             "expected_columns": self.EXPECTED_COLUMNS,
         }
 
+class MasterSummary:
+    def __init__(self):
+        self.metadata = MetaData()
+
+    def get_project_level_summary(
+        self, 
+        db: Session,
+        account_name: Optional[str] = None,
+        project_name: Optional[str] = None,
+        project_status: Optional[str] = None,
+        project_type: Optional[str] = None,
+        month: Optional[int] = None,
+        year: Optional[int] = None,
+        delivery_unit_name: Optional[str] = None
+    ) -> List[ProjectSummary]:
+        """
+        Get project level summary with aggregated revenue data.
+        Each project appears ONCE with all its revenue aggregated.
+        """
+        P = Project
+        A = Account
+        D = DeliveryUnit
+        R = RevenueMaster
+        
+        project_filters = []
+        revenue_join_conditions = [P.id == R.project_id]
+
+        if account_name:
+            project_filters.append(A.name.ilike(f"%{account_name}%"))
+
+        if project_name:
+            project_filters.append(P.name.ilike(f"%{project_name}%"))
+
+        if project_status:
+            project_filters.append(P.status == project_status)
+
+        if project_type:
+            project_filters.append(P.project_type == project_type)
+
+        if delivery_unit_name:
+            project_filters.append(D.name.ilike(f"%{delivery_unit_name}%"))
+
+        # FIXED: Month/year filters should be applied to PROJECT from_date, not revenue collection_date
+        # This ensures when users select July, they see projects that started in July
+        if month:
+            project_filters.append(func.extract('month', P.from_date) == month)
+
+        if year:
+            project_filters.append(func.extract('year', P.from_date) == year)
+
+        project_filters_condition = and_(*project_filters) if project_filters else True
+
+        try:
+            project_level_summary = (
+                db.query(
+                    P.id.label("project_id"),
+                    P.name.label("project_name"),
+                    P.account_id,
+                    A.name.label("account_name"),
+                    D.name.label("delivery_unit_name"),
+                    func.coalesce(func.sum(R.expected_revenue), 0).label("total_expected_rev"),
+                    func.coalesce(func.sum(R.ytd_revenue), 0).label("total_ytd_rev"),
+                    func.coalesce(func.sum(R.ai_direct_revenue), 0).label("total_ai_rev"),
+                    func.coalesce(func.sum(R.ai_assisted_revenue), 0).label("total_ai_assist_rev"),
+                    func.coalesce(func.sum(R.total_revenue), 0).label("total_revenue"),
+                    func.coalesce(func.max(R.ai_direct_people), 0).label("ai_direct_people"),
+                    func.coalesce(P.ai_direct_hours, 0).label("total_ai_direct_hours"),
+                    func.coalesce(P.ai_assist_hours, 0).label("total_ai_assist_hours"),
+                    func.extract('month', P.from_date).label("month"),
+                    func.extract('year', P.from_date).label("year"),
+                    P.status.label("project_status"),
+                    P.project_type.label("project_type"),
+                    P.from_date,
+                    P.to_date,
+                )
+                .outerjoin(A, P.account_id == A.id)
+                .outerjoin(D, A.delivery_unit_id == D.id)
+                .outerjoin(R, and_(*revenue_join_conditions))  # Apply month/year filter in JOIN
+                .filter(project_filters_condition)  # type:ignore
+                .group_by(
+                    P.id,
+                    P.name,
+                    P.account_id,
+                    A.name,
+                    D.name,
+                    P.ai_direct_hours,
+                    P.ai_assist_hours,
+                    P.status,
+                    P.project_type,
+                    P.from_date,
+                    P.to_date
+                )
+                .order_by(P.created_at.desc())
+            )
+
+            project_level_summary = project_level_summary.all()
+
+            response = []
+            for row in project_level_summary:
+                try:
+                    total_expected_rev = self._safe_float(row.total_expected_rev)
+                    total_ytd_rev = self._safe_float(row.total_ytd_rev)
+                    total_ai_rev = self._safe_float(row.total_ai_rev)
+                    total_ai_assist_rev = self._safe_float(row.total_ai_assist_rev)
+                    total_ai_direct_hours = self._safe_float(row.total_ai_direct_hours)
+                    total_ai_assist_hours = self._safe_float(row.total_ai_assist_hours)
+                    ai_direct_people = self._safe_int(row.ai_direct_people)
+                    total_revenue = self._safe_float(row.total_revenue)
+                    month = self._safe_int(row.month)
+                    year = self._safe_int(row.year)
+
+                    summary = ProjectSummary(
+                        project_id=row.project_id,
+                        project_name=row.project_name or "",
+                        account_id=row.account_id,
+                        account_name=row.account_name or "",
+                        delivery_unit_name=row.delivery_unit_name or "",
+                        total_ai_direct_hours=total_ai_direct_hours,
+                        total_ai_assist_hours=total_ai_assist_hours,
+                        ai_direct_people=ai_direct_people,
+                        project_status=row.project_status or "active",
+                        project_type=row.project_type or "",
+                        from_date=row.from_date,
+                        to_date=row.to_date,
+                        total_expected_rev=total_expected_rev,
+                        total_ytd_rev=total_ytd_rev,
+                        total_ai_rev=total_ai_rev,
+                        total_ai_assist_rev=total_ai_assist_rev,
+                        total_revenue=total_revenue,
+                        total_project_count=1,
+                        month=month,
+                        year=year,
+                    )
+                    response.append(summary)
+                except Exception as e:
+                    print(f"Error converting row: {e}")
+                    continue
+
+            return response
+        except Exception as e:
+            print(f"Error in get_project_level_summary: {str(e)}")
+            raise ValueError(f"Failed to fetch project summary: {str(e)}")
+
+    def get_dashboard_statistics(
+        self,
+        db: Session,
+        account_name: Optional[str] = None,
+        project_name: Optional[str] = None,
+        project_status: Optional[str] = None,
+        project_type: Optional[str] = None,
+        month: Optional[int] = None,
+        year: Optional[int] = None,
+        delivery_unit_name: Optional[str] = None
+    ) -> DashboardStatsOut:
+        """Get comprehensive dashboard statistics."""
+        P = Project
+        A = Account
+        R = RevenueMaster
+        D = DeliveryUnit
+
+        filters = []
+        if account_name:
+            filters.append(A.name.ilike(f"%{account_name}%"))
+        if project_name:
+            filters.append(P.name.ilike(f"%{project_name}%"))
+        if project_status:
+            filters.append(P.status == project_status)
+        if project_type:
+            filters.append(P.project_type == project_type)
+        if month:
+            filters.append(func.extract('month', P.from_date) == month)
+        if year:
+            filters.append(func.extract('year', P.from_date) == year)
+        if delivery_unit_name:
+            filters.append(D.name.ilike(f"%{delivery_unit_name}%"))
+
+        base_query = (
+            db.query(P)
+            .outerjoin(A, P.account_id == A.id)
+            .outerjoin(D, A.delivery_unit_id == D.id)
+            .filter(and_(*filters) if filters else True)  # type:ignore
+        )
+
+        total_projects = base_query.distinct().count()
+        log.log_info(f"Total Projects:- {total_projects}")
+        active_projects = base_query.filter(P.status.ilike("active")).distinct().count()
+        non_active_projects = total_projects - active_projects
+
+        revenue_query = (
+            db.query(R)
+            .join(P, R.project_id == P.id)
+            .outerjoin(A, P.account_id == A.id)
+            .outerjoin(D, A.delivery_unit_id == D.id)
+            .filter(and_(*filters) if filters else True)  # type:ignore
+        )
+
+        total_accounts = db.query(Account).count()
+        active_accounts = total_accounts
+        inactive_accounts = 0
+
+        total_revenue = self._safe_float(
+            revenue_query.with_entities(func.sum(R.total_revenue)).scalar()
+        )
+        
+        active_revenue = self._safe_float(
+            revenue_query
+            .filter(P.status.ilike("active"))
+            .with_entities(func.sum(R.total_revenue))
+            .scalar()
+        )
+        
+        non_active_revenue = total_revenue - active_revenue
+        
+        total_ai_assisted_revenue = self._safe_float(
+            revenue_query.with_entities(func.sum(R.ai_assisted_revenue)).scalar()
+        )
+        
+        total_ai_direct_revenue = self._safe_float(
+            revenue_query.with_entities(func.sum(R.ai_direct_revenue)).scalar()
+        )
+
+        project_bifurcation_raw = (
+            base_query.with_entities(
+                P.project_type, 
+                func.count(func.distinct(P.id))  # Count distinct project IDs
+            )
+            .group_by(P.project_type)
+            .all()
+        )
+        project_bifurcation = [
+            {"type": p_type or "Unknown", "count": count}
+            for p_type, count in project_bifurcation_raw
+            if p_type
+        ]
+
+        projects = self.get_project_level_summary(
+            db, account_name, project_name, project_status, 
+            project_type, month, year
+        )
+
+        return DashboardStatsOut(
+            total_accounts=total_accounts,
+            active_accounts=active_accounts,
+            inactive_accounts=inactive_accounts,
+            total_projects=total_projects,
+            active_projects=active_projects,
+            non_active_projects=non_active_projects,
+            total_revenue=total_revenue,
+            active_revenue=active_revenue,
+            non_active_revenue=non_active_revenue,
+            total_ai_assisted_revenue=total_ai_assisted_revenue,
+            total_ai_direct_revenue=total_ai_direct_revenue,
+            project_bifurcation=project_bifurcation,
+            projects=projects,
+        )
+
+    def _safe_float(self, value) -> float:
+        """Safely convert value to float, handling None and NaN."""
+        import math
+        if value is None:
+            return 0.0
+        try:
+            float_val = float(value)
+            if math.isnan(float_val):
+                return 0.0
+            return float_val
+        except (TypeError, ValueError):
+            return 0.0
+
+    def _safe_int(self, value) -> Optional[int]:
+        """Safely convert value to int, handling None."""
+        if value is None:
+            return None
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            return None
 
 
 
