@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from typing import Optional, List
 from sqlalchemy import func, and_, Table, MetaData
 from backend.app.db.session import get_db
-from backend.app.services.dashboard_services import MasterSummary
+from backend.app.services.import_service import MasterSummary
 from backend.app.schemas.dashboard import DashboardStatsOut
 from backend.app.schemas.project import ProjectSummary
 
@@ -23,7 +23,8 @@ async def get_data(db: Session = Depends(get_db) ,
         project_status: Optional[str] = None,
         project_type: Optional[str] = None,
         month: Optional[int] = None,
-        year: Optional[int] = None
+        year: Optional[int] = None,
+        delivery_unit_name: Optional[str] = None
     ):
     summary = MasterSummary()
     try:
@@ -33,7 +34,8 @@ async def get_data(db: Session = Depends(get_db) ,
                                                     project_status,
                                                     project_type,
                                                     month,
-                                                    year)
+                                                    year,
+                                                    delivery_unit_name)
         return response
     except ValueError as ve:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(ve))
@@ -41,7 +43,4 @@ async def get_data(db: Session = Depends(get_db) ,
         raise
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Failed to update project: {str(e)}")
-
-
-
 

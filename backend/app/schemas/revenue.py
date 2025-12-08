@@ -59,8 +59,10 @@ class RevenueOut(RevenueBase):
     @property
     def ai_penetration(self) -> float:
         """Calculate AI revenue penetration percentage."""
-        if self.total_revenue and self.total_revenue > 0:
-            return (self.total_ai_revenue / self.total_revenue) * 100 # type:ignore
+        total_rev = self.total_revenue or 0
+        ai_rev = self.total_ai_revenue or 0  # type: ignore
+        if total_rev > 0 and ai_rev > 0:
+            return (ai_rev / total_rev) * 100  
         return 0.0
 
     class Config:
@@ -95,6 +97,8 @@ class RevenueSummary(BaseModel):
     @property
     def ai_penetration(self) -> float:
         """Calculate AI revenue penetration percentage."""
-        if self.total_revenue and self.total_revenue > 0:
-            return (self.total_ai_revenue / self.total_revenue) * 100
+        total_rev = self.total_revenue or 0
+        ai_rev = self.total_ai_revenue or 0  # type: ignore
+        if total_rev > 0 and ai_rev > 0:
+            return (ai_rev / total_rev) * 100
         return 0.0

@@ -9,13 +9,19 @@ from backend.app.services.import_service import ImportProjectData, ImportRevenue
 from datetime import datetime
 from dotenv import load_dotenv
 from pathlib import Path
-load_dotenv()
 
-TEMP_DIR = Path(os.getenv("TEMP_DIR")) #type:ignore
-PROJECT_SUCCESS_DIR = Path(os.getenv("PROJECT_SUCCESS_DIR")) #type:ignore
-PROJECT_FAILED_DIR = Path(os.getenv("PROJECT_FAILED_DIR")) #type:ignore
-REVENUE_SUCCESS_DIR = Path(os.getenv("REVENUE_SUCCESS_DIR")) #type:ignore
-REVENUE_FAILED_DIR = Path(os.getenv("REVENUE_FAILED_DIR")) #type:ignore
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
+load_dotenv(PROJECT_ROOT / "backend" / ".env")
+
+DEFAULT_TEMP_DIR = PROJECT_ROOT / "temp"
+TEMP_DIR = Path(os.getenv("TEMP_DIR") or DEFAULT_TEMP_DIR)
+PROJECT_SUCCESS_DIR = Path(os.getenv("PROJECT_SUCCESS_DIR") or DEFAULT_TEMP_DIR / "success")
+PROJECT_FAILED_DIR = Path(os.getenv("PROJECT_FAILED_DIR") or DEFAULT_TEMP_DIR / "failed")
+REVENUE_SUCCESS_DIR = Path(os.getenv("REVENUE_SUCCESS_DIR") or DEFAULT_TEMP_DIR / "revenue_success")
+REVENUE_FAILED_DIR = Path(os.getenv("REVENUE_FAILED_DIR") or DEFAULT_TEMP_DIR / "revenue_failed")
+
+for path in [TEMP_DIR, PROJECT_SUCCESS_DIR, PROJECT_FAILED_DIR, REVENUE_SUCCESS_DIR, REVENUE_FAILED_DIR]:
+    path.mkdir(parents=True, exist_ok=True)
 
 router = APIRouter(
     prefix="/import",

@@ -43,8 +43,10 @@ class AccountOut(AccountBase):
     @computed_field
     @property
     def ai_penetration_pct(self) -> float:
-        if self.total_revenue and self.total_revenue > 0:
-            return (self.ai_revenue / self.total_revenue) * 100
+        total_rev = self.total_revenue or 0
+        ai_rev = self.ai_revenue or 0
+        if total_rev > 0 and ai_rev > 0:
+            return (ai_rev / total_rev) * 100
         return 0.0
 
     class Config:
