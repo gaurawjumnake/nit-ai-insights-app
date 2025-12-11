@@ -34,3 +34,4 @@ class Project(Base):
     account = relationship("Account", back_populates="projects")
     revenues = relationship("RevenueMaster", back_populates="project", cascade="all, delete-orphan")
     delivery_unit = relationship("DeliveryUnit", back_populates="projects", )
+    project_documents = relationship("ProjectDocument", back_populates="project")

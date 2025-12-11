@@ -126,3 +126,24 @@ class ProjectSummary(BaseModel):
         if total_rev > 0 and total_ai > 0:
             return (total_ai / total_rev) * 100
         return 0.0
+
+class ProjectExport(BaseModel):
+    name: str = Field(..., description="The project name.")
+    account_id: UUID = Field(..., description="Foreign key linking to the Account.")
+    delivery_unit_id: UUID = Field(..., description="Foreign key linking to the Account.")
+    overview: Optional[str] = None
+    status: Optional[str] = "active"
+    delivery_uni_name: Optional[str] = None
+    account_name: Optional[str] = None
+    # ai_direct_people: Optional[int] = 0
+    ai_direct_hours: Optional[float] = 0.0
+    ai_assist_hours: Optional[float] = 0.0
+    tech_stack: Optional[List[str]] = None
+    ai_recommendations: Optional[str] = None
+    project_type: Optional[str] = None
+    from_date: Optional[datetime] = None
+    to_date: Optional[datetime] = None
+    proposal_end_date: Optional[datetime] = None
+    expected_win_date: Optional[datetime] = None
+    expected_outcome: Optional[str] = None
+    code_coverage_pct: Optional[float] = 0.0

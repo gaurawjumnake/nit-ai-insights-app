@@ -59,3 +59,36 @@ class AccountCreateResponse(AccountBase):
 
     class Config:
         from_attributes = True
+
+
+class AccountRevenueSummary(BaseModel):
+    """Account-level revenue summary for charts and dashboards."""
+    account_id: UUID
+    account_name: str
+    delivery_unit_name: Optional[str] = None
+    project_count: int = 0
+    active_project_count: int = 0
+    inactive_project_count: int = 0
+    total_revenue: float = 0.0
+    total_ai_direct_revenue: float = 0.0
+    total_ai_assisted_revenue: float = 0.0
+    total_expected_revenue: float = 0.0
+    total_ytd_revenue: float = 0.0
+    total_ai_hours: float = 0.0
+    
+    @computed_field
+    @property
+    def total_ai_revenue(self) -> float:
+        """Sum of AI direct and assisted revenue."""
+        return self.total_ai_direct_revenue + self.total_ai_assisted_revenue
+    
+    @computed_field
+    @property
+    def ai_penetration_pct(self) -> float:
+        """AI revenue as percentage of total revenue."""
+        if self.total_revenue > 0:
+            return (self.total_ai_revenue / self.total_revenue) * 100
+        return 0.0
+    
+    class Config:
+        from_attributes = True

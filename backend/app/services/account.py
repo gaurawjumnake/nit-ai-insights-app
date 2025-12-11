@@ -1,15 +1,16 @@
 from sqlalchemy.orm import Session, joinedload, aliased
-from sqlalchemy import func, case, text
+from sqlalchemy import func, case, text, and_, or_
 from math import isfinite
 from typing import List, Optional
 import logging
 from uuid import UUID
 
+from backend.utitlites.app_utilites import safe_float
 from backend.app.models.account import Account, AccountMetricsMV
 from backend.app.models.delivery_unit import DeliveryUnit
 from backend.app.models.project import Project
 from backend.app.models.revenue import RevenueMaster
-from backend.app.schemas.account import AccountCreate, AccountUpdate
+from backend.app.schemas.account import AccountCreate, AccountUpdate, AccountRevenueSummary
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -425,3 +426,126 @@ def get_top_revenue_accounts(db: Session, limit: int = 10) -> List[Account]:
         accounts_with_metrics.append(account)
     
     return accounts_with_metrics
+
+
+def get_account_revenue_summary(
+    db: Session,
+    project_status: Optional[str] = None,
+    project_type: Optional[str] = None,
+    month: Optional[int] = None,
+    year: Optional[int] = None,
+    delivery_unit_name: Optional[str] = None,
+    limit: Optional[int] = None,
+    skip: int = 0
+) -> List[AccountRevenueSummary]:
+    """
+    Get account-level revenue summary with all projects aggregated per account.
+    Filters by collection_date for month/year.
+    
+    Args:
+        project_status: Filter projects by status (e.g., "active")
+        project_type: Filter projects by type
+        month: Filter revenue by collection month (1-12)
+        year: Filter revenue by collection year
+        delivery_unit_name: Filter by delivery unit
+        limit: Limit number of accounts returned
+        skip: Number of accounts to skip (pagination)
+    
+    Returns:
+        List of AccountRevenueSummary with aggregated data per account
+    """
+    P = Project
+    A = Account
+    D = DeliveryUnit
+    R = RevenueMaster
+
+    project_filters = []
+    
+    if project_status:
+        project_filters.append(P.status == project_status)
+    
+    if project_type:
+        project_filters.append(P.project_type == project_type)
+    
+    if delivery_unit_name:
+        project_filters.append(D.name.ilike(f"%{delivery_unit_name}%"))
+
+    revenue_filters = [P.id == R.project_id]
+    
+    if month:
+        revenue_filters.append(func.extract('month', R.collection_date) == month)
+    
+    if year:
+        revenue_filters.append(func.extract('year', R.collection_date) == year)
+    
+    project_filters_condition = and_(*project_filters) if project_filters else True
+    revenue_filters_condition = and_(*revenue_filters)
+    
+    try:
+        query = (
+            db.query(
+                A.id.label("account_id"),
+                A.name.label("account_name"),
+                D.name.label("delivery_unit_name"),
+                func.count(func.distinct(P.id)).label("project_count"),
+                func.sum(
+                    case((P.status.ilike('active'), 1), else_=0)
+                ).label("active_project_count"),
+                func.sum(
+                    case((P.status.ilike('inactive'), 1), else_=0)
+                ).label("inactive_project_count"),
+                func.coalesce(func.sum(R.total_revenue), 0).label("total_revenue"),
+                func.coalesce(func.sum(R.ai_direct_revenue), 0).label("total_ai_direct_revenue"),
+                func.coalesce(func.sum(R.ai_assisted_revenue), 0).label("total_ai_assisted_revenue"),
+                func.coalesce(func.sum(R.expected_revenue), 0).label("total_expected_revenue"),
+                func.coalesce(func.sum(R.ytd_revenue), 0).label("total_ytd_revenue"),
+                func.coalesce(
+                    func.sum(P.ai_direct_hours + P.ai_assist_hours), 0
+                ).label("total_ai_hours"),
+            )
+            .join(D, A.delivery_unit_id == D.id)
+            .join(P, A.id == P.account_id)
+            .outerjoin(R, revenue_filters_condition)
+            .filter(project_filters_condition)  # type: ignore
+            .group_by(
+                A.id,
+                A.name,
+                D.name
+            )
+            .order_by(
+                func.coalesce(func.sum(R.total_revenue), 0).desc()
+            )
+        )
+        
+        if limit is not None:
+            query = query.limit(limit)
+        
+        results = query.offset(skip).all()
+        
+        response = []
+        for row in results:
+            try:
+                summary = AccountRevenueSummary(
+                    account_id=row.account_id,
+                    account_name=row.account_name or "",
+                    delivery_unit_name=row.delivery_unit_name or "",
+                    project_count=int(row.project_count or 0),
+                    active_project_count=int(row.active_project_count or 0),
+                    inactive_project_count=int(row.inactive_project_count or 0),
+                    total_revenue=safe_float(row.total_revenue),
+                    total_ai_direct_revenue=safe_float(row.total_ai_direct_revenue),
+                    total_ai_assisted_revenue=safe_float(row.total_ai_assisted_revenue),
+                    total_expected_revenue = safe_float(row.total_expected_revenue),
+                    total_ytd_revenue=safe_float(row.total_ytd_revenue),
+                    total_ai_hours=safe_float(row.total_ai_hours),
+                )
+                response.append(summary)
+            except Exception as e:
+                print(f"Error converting row: {e}")
+                continue
+        
+        return response
+    except Exception as e:
+        print(f"Error in get_account_revenue_summary: {str(e)}")
+        raise ValueError(f"Failed to fetch account revenue summary: {str(e)}")
+

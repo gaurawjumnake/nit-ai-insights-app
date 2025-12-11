@@ -26,41 +26,41 @@ class MasterSummary:
         project_status: Optional[str] = None,
         project_type: Optional[str] = None,
         month: Optional[int] = None,
-        year: Optional[int] = None
+        year: Optional[int] = None,
+        delivery_unit_name: Optional[str] = None
     ) -> List[ProjectSummary]:
-        """
-        Get project level summary with aggregated revenue data.
-        Each project appears ONCE with all its revenue aggregated.
-        """
         P = Project
         A = Account
         D = DeliveryUnit
         R = RevenueMaster
         
-        filters = []
+        project_filters = []
+        revenue_join_conditions = [P.id == R.project_id]
 
         if account_name:
-            filters.append(A.name.ilike(f"%{account_name}%"))
+            project_filters.append(A.name.ilike(f"%{account_name}%"))
 
         if project_name:
-            filters.append(P.name.ilike(f"%{project_name}%"))
+            project_filters.append(P.name.ilike(f"%{project_name}%"))
 
         if project_status:
-            filters.append(P.status == project_status)
+            project_filters.append(P.status == project_status)
 
         if project_type:
-            filters.append(P.project_type == project_type)
+            project_filters.append(P.project_type == project_type)
+
+        if delivery_unit_name:
+            project_filters.append(D.name.ilike(f"%{delivery_unit_name}%"))
 
         if month:
-            filters.append(func.extract('month', P.from_date) == month)
+            project_filters.append(func.extract('month', R.collection_date) == month)
 
         if year:
-            filters.append(func.extract('year', P.from_date) == year)
+            project_filters.append(func.extract('year', R.collection_date) == year)
 
-        filters_condition = and_(*filters) if filters else True
+        project_filters_condition = and_(*project_filters) if project_filters else True
 
         try:
-            # FIXED: Aggregate revenue data per project using SUM
             project_level_summary = (
                 db.query(
                     P.id.label("project_id"),
@@ -68,15 +68,12 @@ class MasterSummary:
                     P.account_id,
                     A.name.label("account_name"),
                     D.name.label("delivery_unit_name"),
-                    # Aggregate revenue fields - SUM across all revenue records per project
                     func.coalesce(func.sum(R.expected_revenue), 0).label("total_expected_rev"),
                     func.coalesce(func.sum(R.ytd_revenue), 0).label("total_ytd_rev"),
                     func.coalesce(func.sum(R.ai_direct_revenue), 0).label("total_ai_rev"),
                     func.coalesce(func.sum(R.ai_assisted_revenue), 0).label("total_ai_assist_rev"),
                     func.coalesce(func.sum(R.total_revenue), 0).label("total_revenue"),
-                    # Take MAX for people count (assuming it's the same across revenue records)
                     func.coalesce(func.max(R.ai_direct_people), 0).label("ai_direct_people"),
-                    # Project-level fields (don't need aggregation)
                     func.coalesce(P.ai_direct_hours, 0).label("total_ai_direct_hours"),
                     func.coalesce(P.ai_assist_hours, 0).label("total_ai_assist_hours"),
                     func.extract('month', P.from_date).label("month"),
@@ -88,8 +85,8 @@ class MasterSummary:
                 )
                 .outerjoin(A, P.account_id == A.id)
                 .outerjoin(D, A.delivery_unit_id == D.id)
-                .outerjoin(R, P.id == R.project_id)
-                .filter(filters_condition)  # type:ignore
+                .outerjoin(R, and_(*revenue_join_conditions)) 
+                .filter(project_filters_condition)  # type:ignore
                 .group_by(
                     P.id,
                     P.name,
@@ -187,7 +184,6 @@ class MasterSummary:
         if delivery_unit_name:
             filters.append(D.name.ilike(f"%{delivery_unit_name}%"))
 
-        # Base query for projects - NO JOIN with RevenueMaster for counting
         base_query = (
             db.query(P)
             .outerjoin(A, P.account_id == A.id)
@@ -200,7 +196,6 @@ class MasterSummary:
         active_projects = base_query.filter(P.status.ilike("active")).distinct().count()
         non_active_projects = total_projects - active_projects
 
-        # Revenue query with proper join
         revenue_query = (
             db.query(R)
             .join(P, R.project_id == P.id)
@@ -234,7 +229,6 @@ class MasterSummary:
             revenue_query.with_entities(func.sum(R.ai_direct_revenue)).scalar()
         )
 
-        # Project bifurcation should also use distinct count
         project_bifurcation_raw = (
             base_query.with_entities(
                 P.project_type, 
@@ -291,3 +285,4 @@ class MasterSummary:
             return int(value)
         except (TypeError, ValueError):
             return None
+        

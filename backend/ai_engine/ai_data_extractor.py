@@ -58,7 +58,7 @@ class DataExtractor_1:
 
             """,
             expected_output="""Response as per user requirements.""",
-            output_json= output_schema,
+            output_json= output_schema, #type:ignore
             agent=summary_agent,
         )
 
@@ -148,7 +148,7 @@ class DataExtractor:
             4. Handle project documents: SOW, WSR, technical reviews, Jira reports, test reports, SQL results
             """,
             expected_output="Key insights in JSON format matching user requirements",
-            output_json=output_schema,
+            output_json=output_schema, #type:ignore
             agent=self._create_agent()
         )
 

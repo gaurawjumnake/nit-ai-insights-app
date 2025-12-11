@@ -102,3 +102,21 @@ class RevenueSummary(BaseModel):
         if total_rev > 0 and ai_rev > 0:
             return (ai_rev / total_rev) * 100
         return 0.0
+
+class RevenueExport(BaseModel):
+    project_id: UUID = Field(..., description="Foreign key linking to the Project.")
+    project_name: str = Field(..., description="The project name.")
+    account_name : str = Field(..., description="The account name.")
+    delivery_unit_name: str = Field(..., description="Delivery unit name.")
+    expected_revenue: Optional[float] = 0.0
+    ytd_revenue: Optional[float] = 0.0
+    ai_direct_revenue: Optional[float] = 0.0
+    ai_direct_people: Optional[int] = 0
+    ai_assisted_people: Optional[int] = 0
+    ai_assisted_revenue: Optional[float] = 0.0
+    from_date: Optional[datetime] = None
+    to_date: Optional[datetime] = None
+    status: Optional[str] = "active"
+    total_ai_revenue: Optional[float] = 0.0
+    total_revenue: Optional[float] = 0.0
+    collection_date: Optional[datetime] = None
