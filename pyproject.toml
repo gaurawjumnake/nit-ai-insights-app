@@ -16,6 +16,8 @@ dependencies = [
     "pydantic-settings>=2.11.0",
     "pymupdf4llm>=0.2.2",
     "python-dotenv>=1.2.1",
+    "rapidfuzz>=3.14.3",
+    "sentence-transformers>=5.1.2",
     "sqlalchemy>=2.0.44",
     "uvicorn[standard]>=0.38.0",
 ]

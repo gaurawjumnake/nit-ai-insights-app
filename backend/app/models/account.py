@@ -37,6 +37,7 @@ class Account(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     account_manager = Column(String, nullable=True)
 
+    delivery_unit = relationship("DeliveryUnit", back_populates="accounts")
     projects = relationship("Project", back_populates="account")
 
 class AccountMetricsMV(Base):

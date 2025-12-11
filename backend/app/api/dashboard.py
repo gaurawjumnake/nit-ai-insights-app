@@ -1,11 +1,11 @@
-from fastapi import APIRouter, UploadFile, File, Depends, HTTPException,status
+from fastapi import APIRouter, Depends, HTTPException,status
 from sqlalchemy.orm import Session
 from typing import Optional, List
-from sqlalchemy import func, and_, Table, MetaData
 from backend.app.db.session import get_db
-from backend.app.services.import_service import MasterSummary
-from backend.app.schemas.dashboard import DashboardStatsOut
+from backend.app.services.dashboard_services import MasterSummary
+from backend.app.services.account import get_account_revenue_summary
 from backend.app.schemas.project import ProjectSummary
+from backend.app.schemas.account import AccountRevenueSummary
 
 router = APIRouter(
     prefix="/dashboard",
@@ -44,3 +44,29 @@ async def get_data(db: Session = Depends(get_db) ,
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Failed to update project: {str(e)}")
 
+
+@router.get("/account_summary", response_model=List[AccountRevenueSummary])
+def get_account_revenue_summary_endpoint(
+    db: Session = Depends(get_db),
+    project_status: Optional[str] = None ,
+    project_type: Optional[str] = None,
+    month: Optional[int] = None, 
+    year: Optional[int] = None, 
+    delivery_unit_name: Optional[str] = None, 
+    limit: Optional[int] = None, 
+    skip: int = 0
+):
+    """
+    Get account-level revenue summary with all filters applied.
+    Returns all accounts (or limited) with aggregated revenue data.
+    """
+    return get_account_revenue_summary(
+        db=db,
+        project_status=project_status,
+        project_type=project_type,
+        month=month,
+        year=year,
+        delivery_unit_name=delivery_unit_name,
+        limit=limit,
+        skip=skip
+    )
