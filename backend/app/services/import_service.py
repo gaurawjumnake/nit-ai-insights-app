@@ -12,6 +12,7 @@ from backend.app.models.project import Project
 from backend.app.models.delivery_unit import DeliveryUnit
 from backend.app.models.revenue import RevenueMaster
 from backend.app.models.document import ProjectDocument
+from backend.utitlites.app_utilites import safe_float, safe_int
 
 
 class ImportProjectData:
@@ -664,12 +665,12 @@ class ImportRevenueData:
                 skipped_rows += 1
                 continue
 
-            expected_revenue = float(str(row.get("expected_revenue", 0) or 0))
-            ytd_revenue = float(str(row.get("ytd_revenue", 0) or 0))
-            ai_direct_people = int(row.get("ai_direct_people", 0) or 0)
-            ai_assisted_people = int(row.get("ai_assisted_people", 0) or 0)
-            ai_direct_revenue = float(str(row.get("ai_direct_revenue", 0) or 0))
-            ai_assisted_revenue = float(str(row.get("ai_assisted_revenue", 0) or 0))
+            expected_revenue = safe_float(str(row.get("expected_revenue")))
+            ytd_revenue = safe_float(str(row.get("ytd_revenue")))
+            ai_direct_people = safe_int(row.get("ai_direct_people"))
+            ai_assisted_people = safe_int(row.get("ai_assisted_people"))
+            ai_direct_revenue = safe_float(str(row.get("ai_direct_revenue")))
+            ai_assisted_revenue = safe_float(str(row.get("ai_assisted_revenue")))
             
             total_ai_revenue = ai_direct_revenue + ai_assisted_revenue
             

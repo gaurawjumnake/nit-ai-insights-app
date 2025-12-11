@@ -20,6 +20,7 @@ app.include_router(account_api.router, prefix="/v1")
 app.include_router(delivery_unit_api.router, prefix="/v1")
 app.include_router(project_api.router, prefix="/v1")
 app.include_router(import_api.router, prefix="/v1")
+app.include_router(dashboard_api.router, prefix="/v1")
 # app.include_router(sow_extractor_api.router,  prefix="/v1")
 
 # Call the function to initialize tables. 

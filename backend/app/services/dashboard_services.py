@@ -76,8 +76,8 @@ class MasterSummary:
                     func.coalesce(func.max(R.ai_direct_people), 0).label("ai_direct_people"),
                     func.coalesce(P.ai_direct_hours, 0).label("total_ai_direct_hours"),
                     func.coalesce(P.ai_assist_hours, 0).label("total_ai_assist_hours"),
-                    func.extract('month', P.from_date).label("month"),
-                    func.extract('year', P.from_date).label("year"),
+                    func.extract('month', R.collection_date).label("month"),
+                    func.extract('year', R.collection_date).label("year"),
                     P.status.label("project_status"),
                     P.project_type.label("project_type"),
                     P.from_date,
@@ -93,12 +93,13 @@ class MasterSummary:
                     P.account_id,
                     A.name,
                     D.name,
-                    P.ai_direct_hours,
-                    P.ai_assist_hours,
+                    # P.ai_direct_hours,
+                    # P.ai_assist_hours,
                     P.status,
                     P.project_type,
-                    P.from_date,
-                    P.to_date
+                    R.collection_date
+                    # P.from_date,
+                    # P.to_date
                 )
                 .order_by(P.created_at.desc())
             )
