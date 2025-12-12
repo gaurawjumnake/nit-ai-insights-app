@@ -2,15 +2,16 @@ from pydantic import BaseModel, Field, computed_field
 from typing import Optional, List
 from datetime import datetime
 from uuid import UUID
+from backend.app.schemas.delivery_unit import DeliveryUnitOut
 
 
 class ProjectBase(BaseModel):
     name: str = Field(..., description="The project name.")
     account_id: UUID = Field(..., description="Foreign key linking to the Account.")
-    delivery_unit_id: UUID = Field(..., description="Foreign key linking to the Account.")
+    delivery_unit_id: UUID = Field(..., description="Foreign key linking to the delivery unit.")
     overview: Optional[str] = None
     status: Optional[str] = "active"
-    # ai_direct_people: Optional[int] = 0
+    # ai_direct_people: Optional[int] = 0   
     ai_direct_hours: Optional[float] = 0.0
     ai_assist_hours: Optional[float] = 0.0
     tech_stack: Optional[List[str]] = None
@@ -67,12 +68,18 @@ class AccountOut(BaseModel):
     
     class Config:
         from_attributes = True
-
+class DeliveryUnitOut(BaseModel):
+    id: UUID
+    name: str
+    class Config:
+        from_attributes = True
 
 class ProjectOut(ProjectBase):
     id: UUID
     created_at: Optional[datetime] = None
+    account_id: UUID
     account: Optional[AccountOut] = None
+    delivery_unit: Optional[DeliveryUnitOut] = None 
     expected_revenue: Optional[float] = 0.0
     ytd_revenue: Optional[float] = 0.0
     ai_revenue: Optional[float] = 0.0  
@@ -126,3 +133,51 @@ class ProjectSummary(BaseModel):
         if total_rev > 0 and total_ai > 0:
             return (total_ai / total_rev) * 100
         return 0.0
+
+class ProjectExport(ProjectBase):
+    """Schema for exporting project data with flattened names."""
+    
+    # 1. We keep the main fields
+    id: UUID
+    name: str = Field(..., description="The project name.")
+    account_id: UUID
+    delivery_unit_id: UUID
+    
+    # 2. We add HIDDEN fields to catch the database relationships.
+    # exclude=True means the entire nested object won't be in the JSON, 
+    # but we can use it to calculate the names.
+    account: Optional[AccountOut] = Field(default=None, exclude=True)
+    delivery_unit: Optional[DeliveryUnitOut] = Field(default=None, exclude=True)
+
+    # 3. We use @computed_field to extract the names from the hidden fields
+    @computed_field
+    @property
+    def account_name(self) -> Optional[str]:
+        if self.account:
+            return self.account.name
+        return None
+
+    @computed_field
+    @property
+    def delivery_unit_name(self) -> Optional[str]:
+        if self.delivery_unit:
+            return self.delivery_unit.name
+        return None
+
+    # ... (Include the rest of your fields: overview, status, metrics, etc.) ...
+    overview: Optional[str] = None
+    status: Optional[str] = "active"
+    ai_direct_hours: Optional[float] = 0.0
+    ai_assist_hours: Optional[float] = 0.0
+    tech_stack: Optional[List[str]] = None
+    ai_recommendations: Optional[str] = None
+    project_type: Optional[str] = None
+    from_date: Optional[datetime] = None
+    to_date: Optional[datetime] = None
+    proposal_end_date: Optional[datetime] = None
+    expected_win_date: Optional[datetime] = None
+    expected_outcome: Optional[str] = None
+    code_coverage_pct: Optional[float] = 0.0
+
+    class Config:
+        from_attributes = True

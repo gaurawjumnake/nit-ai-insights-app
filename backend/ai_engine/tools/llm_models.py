@@ -14,12 +14,17 @@ load_dotenv()
 #     api_version="2024-02-15-preview",
 # )
 
-llm = LLM(model="azure/gpt-4o",
-          api_key=os.getenv("AZURE_API_KEY"),
-          api_base=os.getenv("AZURE_API_BASE"),
-          api_version=os.getenv("AZURE_API_VERSION"),
-          temperature=0.5,
-          )
+# llm = LLM(model="azure/gpt-4o",
+#           api_key=os.getenv("AZURE_API_KEY"),
+#           api_base=os.getenv("AZURE_API_BASE"),
+#           api_version=os.getenv("AZURE_API_VERSION"),
+#           temperature=0.5,
+#           )
+llm = LLM(
+    model="gemini/gemini-2.5-flash",
+    api_key=os.getenv("GEMINI_API_KEY"),  # Or set GOOGLE_API_KEY/GEMINI_API_KEY
+    temperature=0.7
+)
 
 # Sample code to test llm ############################################
 
