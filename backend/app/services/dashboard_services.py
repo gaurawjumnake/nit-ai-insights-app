@@ -274,8 +274,8 @@ class MasterSummary:
                     total_ai_assist_rev=self._safe_float(row.total_ai_assist_rev),
                     total_revenue=self._safe_float(row.total_revenue),
                     total_project_count=1,
-                    month=month,
-                    year=year,
+                    # month=month,
+                    # year=year,
                 )
                 response.append(summary)
 

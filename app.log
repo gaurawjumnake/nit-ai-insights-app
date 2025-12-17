@@ -2141,3 +2141,4 @@ WHERE true GROUP BY projects.id, projects.name, projects.account_id, accounts.na
 2025-12-17 18:10:24 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
 2025-12-17 18:16:39 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
 2025-12-17 18:33:38 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 22:03:49 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
