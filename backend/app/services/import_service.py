@@ -5,7 +5,7 @@ from sqlalchemy import or_
 from uuid import uuid4
 import datetime
 from typing import Dict, Any, Optional, List
-from backend.ai_engine.tools.app_logger import Logger
+from backend.doc_insighter.tools.app_logger import Logger
 log = Logger()
 from backend.app.models.account import Account
 from backend.app.models.project import Project

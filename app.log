@@ -1290,3 +1290,854 @@
 2025-12-11 23:10:16 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
 2025-12-11 23:26:08 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
 2025-12-11 23:26:38 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-12 00:03:24 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-12 00:04:02 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-12 00:30:59 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-12 00:31:28 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-12 01:04:57 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-12 01:05:33 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-12 16:50:56 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-12 16:52:59 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-12 16:54:56 | INFO     | backend.app.api.export_data:get_revenues_endpoint | Revenue data fetched for export- 592
+2025-12-12 16:54:56 | ERROR    | contextlib:__exit__ | Error while connecting db- Out of range float values are not JSON compliant: nan
+2025-12-12 16:54:56 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-12 16:55:44 | INFO     | backend.app.api.export_data:get_revenues_endpoint | Revenue data fetched for export- 592
+2025-12-12 16:55:44 | ERROR    | contextlib:__exit__ | Error while connecting db- Out of range float values are not JSON compliant: nan
+2025-12-12 16:55:44 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-12 16:58:36 | INFO     | backend.app.api.export_data:get_revenues_endpoint | Revenue data fetched for export- 592
+2025-12-12 16:58:36 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-12 17:01:54 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-15 16:54:07 | ERROR    | contextlib:__exit__ | Error while connecting db- [{'type': 'missing', 'loc': ('body', 'file'), 'msg': 'Field required', 'input': None}]
+2025-12-15 16:54:07 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-15 16:55:20 | ERROR    | contextlib:__exit__ | Error while connecting db- [{'type': 'missing', 'loc': ('body', 'file'), 'msg': 'Field required', 'input': None}]
+2025-12-15 16:55:20 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-15 17:01:37 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-15 17:09:28 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-15 19:40:32 | INFO     | unknown:unknown | Running parser_main for test file: test_data\sample sow.pdf with base_name: sample sow
+2025-12-15 19:40:32 | INFO     | __main__:<module> | Attempting to parse document: test_data\sample sow.pdf with LlamaCloudDocumentParser.
+2025-12-15 19:40:32 | INFO     | __main__:run_parser | Starting to parse: test_data\sample sow.pdf
+2025-12-15 19:40:44 | WARNING  | __main__:parse_single_document | Error processing page 3: list indices must be integers or slices, not str
+2025-12-15 19:40:44 | WARNING  | __main__:parse_single_document | Error processing page 7: list indices must be integers or slices, not str
+2025-12-15 19:40:44 | INFO     | __main__:run_parser | Successfully parsed test_data\sample sow.pdf - 6 pages in 11.66s
+2025-12-15 19:40:44 | INFO     | __main__:<module> | Successfully parsed: sample sow.pdf, Pages: 6
+2025-12-15 19:40:44 | INFO     | __main__:run_parser | Results saved to sample sow_parsed_results.json
+2025-12-15 19:40:44 | INFO     | unknown:unknown | parser_main returned 1 document(s).
+2025-12-15 19:40:44 | INFO     | unknown:unknown | Sample of parsed data (first document):
+2025-12-15 19:50:41 | INFO     | unknown:unknown | Running parser_main for test file: test_data\sample sow.pdf with base_name: sample sow
+2025-12-15 19:50:41 | INFO     | __main__:<module> | Attempting to parse document: test_data\sample sow.pdf with LlamaCloudDocumentParser.
+2025-12-15 19:50:41 | INFO     | __main__:run_parser | Starting to parse: test_data\sample sow.pdf
+2025-12-15 19:50:53 | INFO     | __main__:run_parser | Successfully parsed test_data\sample sow.pdf - 8 pages in 11.27s
+2025-12-15 19:50:53 | INFO     | __main__:<module> | Successfully parsed: sample sow.pdf, Pages: 8
+2025-12-15 19:50:53 | INFO     | __main__:run_parser | Results saved to sample sow_parsed_results.json
+2025-12-15 19:50:53 | INFO     | unknown:unknown | parser_main returned 1 document(s).
+2025-12-15 19:50:53 | INFO     | unknown:unknown | Sample of parsed data (first document):
+2025-12-15 20:13:59 | INFO     | __main__:<module> | Running parser for : test_data\sample sow.pdf with base_name: sample sow
+2025-12-15 20:13:59 | INFO     | backend.doc_insighter.core.llama_parsing:extract_all_text | Attempting to parse document: test_data\sample sow.pdf with LlamaCloudDocumentParser.
+2025-12-15 20:13:59 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Starting to parse: test_data\sample sow.pdf
+2025-12-15 20:14:10 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Successfully parsed test_data\sample sow.pdf - 8 pages in 11.24s
+2025-12-15 20:14:10 | INFO     | backend.doc_insighter.core.llama_parsing:extract_all_text | Successfully parsed: sample sow.pdf, Pages: 8
+2025-12-15 20:14:10 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Results saved to backend/tempsample sow_parsed_results.json
+2025-12-15 20:16:19 | INFO     | __main__:<module> | Running parser for : test_data\sample sow.pdf with base_name: sample sow
+2025-12-15 20:16:19 | INFO     | backend.doc_insighter.core.llama_parsing:extract_all_text | Attempting to parse document: test_data\sample sow.pdf with LlamaCloudDocumentParser.
+2025-12-15 20:16:19 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Starting to parse: test_data\sample sow.pdf
+2025-12-15 20:16:30 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Successfully parsed test_data\sample sow.pdf - 8 pages in 10.87s
+2025-12-15 20:16:30 | INFO     | backend.doc_insighter.core.llama_parsing:extract_all_text | Successfully parsed: sample sow.pdf, Pages: 8
+2025-12-15 20:16:30 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Results saved to backend/tempsample sow_parsed_results.json
+2025-12-15 20:18:15 | INFO     | __main__:<module> | Running parser for : test_data\sample sow.pdf with base_name: sample sow
+2025-12-15 20:18:15 | INFO     | backend.doc_insighter.core.llama_parsing:extract_all_text | Attempting to parse document: test_data\sample sow.pdf with LlamaCloudDocumentParser.
+2025-12-15 20:18:15 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Starting to parse: test_data\sample sow.pdf
+2025-12-15 20:18:26 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Successfully parsed test_data\sample sow.pdf - 8 pages in 10.83s
+2025-12-15 20:18:26 | INFO     | backend.doc_insighter.core.llama_parsing:extract_all_text | Successfully parsed: sample sow.pdf, Pages: 8
+2025-12-15 20:18:26 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Results saved to backend/temp/sample sow_parsed_results.json
+2025-12-15 22:42:04 | INFO     | __main__:run_doc_processor | Running parser for : test_data\sample sow.pdf with base_name: sample sow
+2025-12-15 22:42:04 | INFO     | backend.doc_insighter.core.llama_parsing:extract_all_text | Attempting to parse document: test_data\sample sow.pdf with LlamaCloudDocumentParser.
+2025-12-15 22:42:04 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Starting to parse: test_data\sample sow.pdf
+2025-12-15 22:42:16 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Successfully parsed test_data\sample sow.pdf - 8 pages in 11.55s
+2025-12-15 22:42:16 | INFO     | backend.doc_insighter.core.llama_parsing:extract_all_text | Successfully parsed: sample sow.pdf, Pages: 8
+2025-12-15 22:42:16 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Results saved to backend/temp/sample sow_parsed_results.json
+2025-12-15 22:42:16 | INFO     | __main__:extract_insights | Processing PDF file: # Document: sample sow.pdf
+## Page 1
+STATEMENT OF WORK (SOW)
+**UI Automation Framework Migration: TestStack.White to FlaUI**
+**Document Version:** 1.0 
+**Date:** December 5, 2025 
+**Project Duration:** [Insert Duration] 
+**Prepared For:** [Client Name] 
+**Prepared By:** [Vendor/Team Name] 
+----
+### 1. PROJECT OVERVIEW
+#### 1.1 Background
+The current UI automation framework uses TestStack.White, which is no longer actively maintained and lacks support for modern Windows applications. This project will migrate the existing automation scripts and test cases to FlaUI, a modern and actively maintained UI automation library that provides better support for WPF, WinForms, Win32, and UWP applications.
+#### 1.2 Objectives
+- Migrate all existing TestStack.White automation scripts to FlaUI
+- Modernize the test automation framework architecture
+- Ensure all migrated test cases maintain or improve their reliability
+- Provide comprehensive documentation for the new framework
+- Train the team on FlaUI best practices
+## Page 2
+## 2. Scope of Work
+### 2.1 In-Scope Activities
+**Phase 1: Assessment & Planning (Week 1-2)**
+- Conduct inventory of existing TestStack.White scripts and test cases
+- Analyze dependencies and identify potential migration challenges
+- Create detailed migration strategy and approach document
+- Set up FlaUI development and test environments
+- Define coding standards and framework architecture for FlaUI
+**Phase 2: Framework Development (Week 3-4)**
+- Design and implement base framework structure using FlaUI
+- Create reusable component libraries and helper methods
+- Implement logging, reporting, and error handling mechanisms
+- Set up CI/CD pipeline integration for automated test execution
+- Develop sample test scripts to validate framework functionality
+**Phase 3: Test Case Migration (Week 5-8)**
+- Migrate test scripts from TestStack.White to FlaUI
+- Update element locators and interaction methods
+- Refactor code to align with FlaUI best practices
+- Implement parallel execution capabilities where applicable
+- Create mapping document showing old vs. new implementations
+**Phase 4: Testing & Validation (Week 9-10)**
+- Execute all migrated test cases to verify functionality
+- Perform comparative analysis of test execution times
+- Identify and fix defects in migrated scripts
+- Conduct regression testing across all application modules
+- Performance benchmarking and optimization
+## Page 3
+Phase 5: Documentation & Knowledge Transfer (Week 11-12)
+- Create comprehensive technical documentation
+- Develop user guides and quick reference materials
+- Conduct training sessions for QA team members
+- Provide hands-on workshops for script maintenance
+- Deliver final project report with lessons learned
+2.2 Out-of-Scope
+- Development of new test cases beyond existing coverage
+- Application defect fixing (only test script issues will be addressed)
+- Infrastructure upgrades beyond what's needed for FlaUI
+- Migration of non-UI automation tests
+- Performance testing or load testing activities
+3. DELIVERABLES
+| Deliverable | Description | Due Date |
+|-------------------------------|-------------------------------------------------------|----------------|
+| Migration Strategy Document | Detailed approach, timeline, and risk assessment | End of Week 2 |
+| FlaUI Framework Architecture | Base framework with core utilities and libraries | End of Week 4 |
+| Migrated Test Scripts | All test cases converted to FlaUI | End of Week 8 |
+| Test Execution Reports | Results from validation testing phase | End of Week 10 |
+| Technical Documentation | Architecture, coding standards, troubleshooting guide | End of Week 11 |
+| Training Materials | User guides, video tutorials, example scripts | End of Week 11 |
+| Knowledge Transfer Sessions | 3 interactive training sessions (2 hours each) | Week 12 |
+| Final Project Report | Summary, metrics, recommendations | End of Week 12 |
+### Table 1
+| Deliverable | Description | Due Date |
+|---|---|---|
+| Migration Strategy Document | Detailed approach, timeline, and risk assessment | End of Week 2 |
+| FlaUI Framework Architecture | Base framework with core utilities and libraries | End of Week 4 |
+| Migrated Test Scripts | All test cases converted to FlaUI | End of Week 8 |
+| Test Execution Reports | Results from validation testing phase | End of Week 10 |
+| Technical Documentation | Architecture, coding standards, troubleshooting guide | End of Week 11 |
+| Training Materials | User guides, video tutorials, example scripts | End of Week 11 |
+| Knowledge Transfer Sessions | 3 interactive training sessions (2 hours each) | Week 12 |
+| Final Project Report | Summary, metrics, recommendations | End of Week 12 |
+## Page 4
+4. ASSUMPTIONS & DEPENDENCIES
+### 4.1 Assumptions
+- Client will provide access to all existing TestStack.White codebases
+- Test environments and applications under test will be available throughout the project
+- Client team will be available for clarifications and validation
+- All necessary licenses and tools will be provided by the client
+- Current test data and test environments are stable and accessible
+### 4.2 Dependencies
+- Timely access to source code repositories
+- Availability of subject matter experts from the client side
+- Test environment availability during migration and testing phases
+- Approval cycles will not exceed 3 business days
+- No major application updates during the migration period
+5. PROJECT TIMELINE
+**Total Duration: 12 Weeks**
+- **Weeks 1-2:** Assessment & Planning
+- **Weeks 3-4:** Framework Development
+- **Weeks 5-8:** Test Case Migration
+- **Weeks 9-10:** Testing & Validation
+- **Weeks 11-12:** Documentation & Knowledge Transfer
+**Key Milestones:**
+- Week 2: Migration strategy approved
+- Week 4: Framework ready for migration
+- Week 8: All scripts migrated
+- Week 10: Validation complete
+- Week 12: Project closure
+## Page 5
+6. ROLES & RESPONSIBILITIES
+### 6.1 Vendor/Service Provider Responsibilities
+- Provide experienced automation engineers for migration work
+- Develop and deliver all project deliverables
+- Conduct regular status meetings and progress updates
+- Provide technical support during knowledge transfer period
+- Deliver quality assurance for all migrated scripts
+### 6.2 Client Responsibilities
+- Provide access to existing codebase and documentation
+- Make test environments and applications available
+- Assign SMEs for knowledge sharing and validation
+- Review and approve deliverables within agreed timelines
+- Participate in training and knowledge transfer sessions
+- Provide feedback and clarifications as needed
+7. ACCEPTANCE CRITERIA
+Each deliverable will be accepted based on the following criteria:
+1. **Migrated Test Scripts:**
+ - All existing test cases successfully converted to FlaUI
+ - Test execution success rate ≥ 95%
+ - No degradation in test coverage
+ - Code follows agreed-upon standards
+2. **Framework Architecture:**
+ - Modular and maintainable code structure
+ - Proper error handling and logging implemented
+ - CI/CD integration functional
+ - Performance meets or exceeds current framework
+3. **Documentation:**
+## Page 6
+- Comprehensive and easy to understand
+- Includes code examples and use cases
+- Covers troubleshooting and FAQs
+- Approved by client technical leads
+4. Knowledge Transfer:
+ - Team members can independently maintain scripts
+ - Training session feedback scores ≥ 4/5
+ - Q&A sessions completed
+### 8. PAYMENT TERMS
+**Total Project Cost:** [Insert Amount]
+**Payment Schedule:**
+- 20% upon SOW signing and project kickoff
+- 30% upon completion of Phase 2 (Framework Development)
+- 30% upon completion of Phase 3 (Test Case Migration)
+- 20% upon final acceptance and project closure
+**Payment Method:** [Specify method]
+**Invoice Terms:** Net 30 days
+### 9. CHANGE MANAGEMENT
+Any changes to the scope, timeline, or deliverables must be documented through a formal Change Request process:
+1. Change request submitted in writing
+2. Impact analysis conducted (time, cost, resources)
+3. Approval from both parties required
+4. SOW amended with updated details
+5. Work proceeds only after approval
+## Page 7
+10. RISK MANAGEMENT
+| Risk | Impact | Mitigation Strategy |
+|-------------------------------------------|--------|----------------------------------------------------------|
+| Complex legacy code difficult to migrate | High | Early assessment, allocate buffer time |
+| Test environment instability | Medium | Request stable environments, use test data snapshots |
+| Key personnel unavailability | Medium | Cross-train team members, maintain documentation |
+| Undocumented TestStack.White customizations | High | Conduct thorough code review, engage original developers |
+| Application changes during migration | High | Freeze application updates during migration period |
+11. TERMS & CONDITIONS
+- All intellectual property created during this project belongs to the Client
+- Both parties agree to maintain confidentiality of proprietary information
+- This SOW is valid for 90 days from the date of issue
+- Project governed by the Master Services Agreement between parties
+- Either party may terminate with 30 days written notice with appropriate compensation
+12. SIGN-OFF
+**Client Approval:**
+Name: ________________________
+Title: ________________________
+Signature: ____________________
+Date: ________________________
+**Vendor Approval:**
+### Table 1
+| Risk | Impact | Mitigation Strategy |
+|---|---|---|
+| Complex legacy code difficult to migrate | High | Early assessment, allocate buffer time |
+| Test environment instability | Medium | Request stable environments, use test data snapshots |
+| Key personnel unavailability | Medium | Cross-train team members, maintain documentation |
+| Undocumented TestStack.White customizations | High | Conduct thorough code review, engage original developers |
+| Application changes during migration | High | Freeze application updates during migration period |
+## Page 8
+Name: ____________________
+Title: ____________________
+Signature: ____________________
+Date: ____________________
+### 13. APPENDICES
+**Appendix A:** Current Test Inventory List
+**Appendix B:** FlaUI vs TestStack.White Feature Comparison
+**Appendix C:** Technical Architecture Diagram
+**Appendix D:** Training Schedule
+**Appendix E:** Communication Plan
+2025-12-15 22:42:16 | INFO     | backend.doc_insighter.core.ai_agent:extract_data | Converting PDF file: # Document: sample sow.pdf
+## Page 1
+STATEMENT OF WORK (SOW)
+**UI Automation Framework Migration: TestStack.White to FlaUI**
+**Document Version:** 1.0 
+**Date:** December 5, 2025 
+**Project Duration:** [Insert Duration] 
+**Prepared For:** [Client Name] 
+**Prepared By:** [Vendor/Team Name] 
+----
+### 1. PROJECT OVERVIEW
+#### 1.1 Background
+The current UI automation framework uses TestStack.White, which is no longer actively maintained and lacks support for modern Windows applications. This project will migrate the existing automation scripts and test cases to FlaUI, a modern and actively maintained UI automation library that provides better support for WPF, WinForms, Win32, and UWP applications.
+#### 1.2 Objectives
+- Migrate all existing TestStack.White automation scripts to FlaUI
+- Modernize the test automation framework architecture
+- Ensure all migrated test cases maintain or improve their reliability
+- Provide comprehensive documentation for the new framework
+- Train the team on FlaUI best practices
+## Page 2
+## 2. Scope of Work
+### 2.1 In-Scope Activities
+**Phase 1: Assessment & Planning (Week 1-2)**
+- Conduct inventory of existing TestStack.White scripts and test cases
+- Analyze dependencies and identify potential migration challenges
+- Create detailed migration strategy and approach document
+- Set up FlaUI development and test environments
+- Define coding standards and framework architecture for FlaUI
+**Phase 2: Framework Development (Week 3-4)**
+- Design and implement base framework structure using FlaUI
+- Create reusable component libraries and helper methods
+- Implement logging, reporting, and error handling mechanisms
+- Set up CI/CD pipeline integration for automated test execution
+- Develop sample test scripts to validate framework functionality
+**Phase 3: Test Case Migration (Week 5-8)**
+- Migrate test scripts from TestStack.White to FlaUI
+- Update element locators and interaction methods
+- Refactor code to align with FlaUI best practices
+- Implement parallel execution capabilities where applicable
+- Create mapping document showing old vs. new implementations
+**Phase 4: Testing & Validation (Week 9-10)**
+- Execute all migrated test cases to verify functionality
+- Perform comparative analysis of test execution times
+- Identify and fix defects in migrated scripts
+- Conduct regression testing across all application modules
+- Performance benchmarking and optimization
+## Page 3
+Phase 5: Documentation & Knowledge Transfer (Week 11-12)
+- Create comprehensive technical documentation
+- Develop user guides and quick reference materials
+- Conduct training sessions for QA team members
+- Provide hands-on workshops for script maintenance
+- Deliver final project report with lessons learned
+2.2 Out-of-Scope
+- Development of new test cases beyond existing coverage
+- Application defect fixing (only test script issues will be addressed)
+- Infrastructure upgrades beyond what's needed for FlaUI
+- Migration of non-UI automation tests
+- Performance testing or load testing activities
+3. DELIVERABLES
+| Deliverable | Description | Due Date |
+|-------------------------------|-------------------------------------------------------|----------------|
+| Migration Strategy Document | Detailed approach, timeline, and risk assessment | End of Week 2 |
+| FlaUI Framework Architecture | Base framework with core utilities and libraries | End of Week 4 |
+| Migrated Test Scripts | All test cases converted to FlaUI | End of Week 8 |
+| Test Execution Reports | Results from validation testing phase | End of Week 10 |
+| Technical Documentation | Architecture, coding standards, troubleshooting guide | End of Week 11 |
+| Training Materials | User guides, video tutorials, example scripts | End of Week 11 |
+| Knowledge Transfer Sessions | 3 interactive training sessions (2 hours each) | Week 12 |
+| Final Project Report | Summary, metrics, recommendations | End of Week 12 |
+### Table 1
+| Deliverable | Description | Due Date |
+|---|---|---|
+| Migration Strategy Document | Detailed approach, timeline, and risk assessment | End of Week 2 |
+| FlaUI Framework Architecture | Base framework with core utilities and libraries | End of Week 4 |
+| Migrated Test Scripts | All test cases converted to FlaUI | End of Week 8 |
+| Test Execution Reports | Results from validation testing phase | End of Week 10 |
+| Technical Documentation | Architecture, coding standards, troubleshooting guide | End of Week 11 |
+| Training Materials | User guides, video tutorials, example scripts | End of Week 11 |
+| Knowledge Transfer Sessions | 3 interactive training sessions (2 hours each) | Week 12 |
+| Final Project Report | Summary, metrics, recommendations | End of Week 12 |
+## Page 4
+4. ASSUMPTIONS & DEPENDENCIES
+### 4.1 Assumptions
+- Client will provide access to all existing TestStack.White codebases
+- Test environments and applications under test will be available throughout the project
+- Client team will be available for clarifications and validation
+- All necessary licenses and tools will be provided by the client
+- Current test data and test environments are stable and accessible
+### 4.2 Dependencies
+- Timely access to source code repositories
+- Availability of subject matter experts from the client side
+- Test environment availability during migration and testing phases
+- Approval cycles will not exceed 3 business days
+- No major application updates during the migration period
+5. PROJECT TIMELINE
+**Total Duration: 12 Weeks**
+- **Weeks 1-2:** Assessment & Planning
+- **Weeks 3-4:** Framework Development
+- **Weeks 5-8:** Test Case Migration
+- **Weeks 9-10:** Testing & Validation
+- **Weeks 11-12:** Documentation & Knowledge Transfer
+**Key Milestones:**
+- Week 2: Migration strategy approved
+- Week 4: Framework ready for migration
+- Week 8: All scripts migrated
+- Week 10: Validation complete
+- Week 12: Project closure
+## Page 5
+6. ROLES & RESPONSIBILITIES
+### 6.1 Vendor/Service Provider Responsibilities
+- Provide experienced automation engineers for migration work
+- Develop and deliver all project deliverables
+- Conduct regular status meetings and progress updates
+- Provide technical support during knowledge transfer period
+- Deliver quality assurance for all migrated scripts
+### 6.2 Client Responsibilities
+- Provide access to existing codebase and documentation
+- Make test environments and applications available
+- Assign SMEs for knowledge sharing and validation
+- Review and approve deliverables within agreed timelines
+- Participate in training and knowledge transfer sessions
+- Provide feedback and clarifications as needed
+7. ACCEPTANCE CRITERIA
+Each deliverable will be accepted based on the following criteria:
+1. **Migrated Test Scripts:**
+ - All existing test cases successfully converted to FlaUI
+ - Test execution success rate ≥ 95%
+ - No degradation in test coverage
+ - Code follows agreed-upon standards
+2. **Framework Architecture:**
+ - Modular and maintainable code structure
+ - Proper error handling and logging implemented
+ - CI/CD integration functional
+ - Performance meets or exceeds current framework
+3. **Documentation:**
+## Page 6
+- Comprehensive and easy to understand
+- Includes code examples and use cases
+- Covers troubleshooting and FAQs
+- Approved by client technical leads
+4. Knowledge Transfer:
+ - Team members can independently maintain scripts
+ - Training session feedback scores ≥ 4/5
+ - Q&A sessions completed
+### 8. PAYMENT TERMS
+**Total Project Cost:** [Insert Amount]
+**Payment Schedule:**
+- 20% upon SOW signing and project kickoff
+- 30% upon completion of Phase 2 (Framework Development)
+- 30% upon completion of Phase 3 (Test Case Migration)
+- 20% upon final acceptance and project closure
+**Payment Method:** [Specify method]
+**Invoice Terms:** Net 30 days
+### 9. CHANGE MANAGEMENT
+Any changes to the scope, timeline, or deliverables must be documented through a formal Change Request process:
+1. Change request submitted in writing
+2. Impact analysis conducted (time, cost, resources)
+3. Approval from both parties required
+4. SOW amended with updated details
+5. Work proceeds only after approval
+## Page 7
+10. RISK MANAGEMENT
+| Risk | Impact | Mitigation Strategy |
+|-------------------------------------------|--------|----------------------------------------------------------|
+| Complex legacy code difficult to migrate | High | Early assessment, allocate buffer time |
+| Test environment instability | Medium | Request stable environments, use test data snapshots |
+| Key personnel unavailability | Medium | Cross-train team members, maintain documentation |
+| Undocumented TestStack.White customizations | High | Conduct thorough code review, engage original developers |
+| Application changes during migration | High | Freeze application updates during migration period |
+11. TERMS & CONDITIONS
+- All intellectual property created during this project belongs to the Client
+- Both parties agree to maintain confidentiality of proprietary information
+- This SOW is valid for 90 days from the date of issue
+- Project governed by the Master Services Agreement between parties
+- Either party may terminate with 30 days written notice with appropriate compensation
+12. SIGN-OFF
+**Client Approval:**
+Name: ________________________
+Title: ________________________
+Signature: ____________________
+Date: ________________________
+**Vendor Approval:**
+### Table 1
+| Risk | Impact | Mitigation Strategy |
+|---|---|---|
+| Complex legacy code difficult to migrate | High | Early assessment, allocate buffer time |
+| Test environment instability | Medium | Request stable environments, use test data snapshots |
+| Key personnel unavailability | Medium | Cross-train team members, maintain documentation |
+| Undocumented TestStack.White customizations | High | Conduct thorough code review, engage original developers |
+| Application changes during migration | High | Freeze application updates during migration period |
+## Page 8
+Name: ____________________
+Title: ____________________
+Signature: ____________________
+Date: ____________________
+### 13. APPENDICES
+**Appendix A:** Current Test Inventory List
+**Appendix B:** FlaUI vs TestStack.White Feature Comparison
+**Appendix C:** Technical Architecture Diagram
+**Appendix D:** Training Schedule
+**Appendix E:** Communication Plan
+2025-12-15 22:42:16 | ERROR    | __main__:run_doc_processor | Failed to process SOW document-no such file: '# Document: sample sow.pdf
+## Page 1
+STATEMENT OF WORK (SOW)
+**UI Automation Framework Migration: TestStack.White to FlaUI**
+**Document Version:** 1.0 
+**Date:** December 5, 2025 
+**Project Duration:** [Insert Duration] 
+**Prepared For:** [Client Name] 
+**Prepared By:** [Vendor/Team Name] 
+----
+### 1. PROJECT OVERVIEW
+#### 1.1 Background
+The current UI automation framework uses TestStack.White, which is no longer actively maintained and lacks support for modern Windows applications. This project will migrate the existing automation scripts and test cases to FlaUI, a modern and actively maintained UI automation library that provides better support for WPF, WinForms, Win32, and UWP applications.
+#### 1.2 Objectives
+- Migrate all existing TestStack.White automation scripts to FlaUI
+- Modernize the test automation framework architecture
+- Ensure all migrated test cases maintain or improve their reliability
+- Provide comprehensive documentation for the new framework
+- Train the team on FlaUI best practices
+## Page 2
+## 2. Scope of Work
+### 2.1 In-Scope Activities
+**Phase 1: Assessment & Planning (Week 1-2)**
+- Conduct inventory of existing TestStack.White scripts and test cases
+- Analyze dependencies and identify potential migration challenges
+- Create detailed migration strategy and approach document
+- Set up FlaUI development and test environments
+- Define coding standards and framework architecture for FlaUI
+**Phase 2: Framework Development (Week 3-4)**
+- Design and implement base framework structure using FlaUI
+- Create reusable component libraries and helper methods
+- Implement logging, reporting, and error handling mechanisms
+- Set up CI/CD pipeline integration for automated test execution
+- Develop sample test scripts to validate framework functionality
+**Phase 3: Test Case Migration (Week 5-8)**
+- Migrate test scripts from TestStack.White to FlaUI
+- Update element locators and interaction methods
+- Refactor code to align with FlaUI best practices
+- Implement parallel execution capabilities where applicable
+- Create mapping document showing old vs. new implementations
+**Phase 4: Testing & Validation (Week 9-10)**
+- Execute all migrated test cases to verify functionality
+- Perform comparative analysis of test execution times
+- Identify and fix defects in migrated scripts
+- Conduct regression testing across all application modules
+- Performance benchmarking and optimization
+## Page 3
+Phase 5: Documentation & Knowledge Transfer (Week 11-12)
+- Create comprehensive technical documentation
+- Develop user guides and quick reference materials
+- Conduct training sessions for QA team members
+- Provide hands-on workshops for script maintenance
+- Deliver final project report with lessons learned
+2.2 Out-of-Scope
+- Development of new test cases beyond existing coverage
+- Application defect fixing (only test script issues will be addressed)
+- Infrastructure upgrades beyond what's needed for FlaUI
+- Migration of non-UI automation tests
+- Performance testing or load testing activities
+3. DELIVERABLES
+| Deliverable | Description | Due Date |
+|-------------------------------|-------------------------------------------------------|----------------|
+| Migration Strategy Document | Detailed approach, timeline, and risk assessment | End of Week 2 |
+| FlaUI Framework Architecture | Base framework with core utilities and libraries | End of Week 4 |
+| Migrated Test Scripts | All test cases converted to FlaUI | End of Week 8 |
+| Test Execution Reports | Results from validation testing phase | End of Week 10 |
+| Technical Documentation | Architecture, coding standards, troubleshooting guide | End of Week 11 |
+| Training Materials | User guides, video tutorials, example scripts | End of Week 11 |
+| Knowledge Transfer Sessions | 3 interactive training sessions (2 hours each) | Week 12 |
+| Final Project Report | Summary, metrics, recommendations | End of Week 12 |
+### Table 1
+| Deliverable | Description | Due Date |
+|---|---|---|
+| Migration Strategy Document | Detailed approach, timeline, and risk assessment | End of Week 2 |
+| FlaUI Framework Architecture | Base framework with core utilities and libraries | End of Week 4 |
+| Migrated Test Scripts | All test cases converted to FlaUI | End of Week 8 |
+| Test Execution Reports | Results from validation testing phase | End of Week 10 |
+| Technical Documentation | Architecture, coding standards, troubleshooting guide | End of Week 11 |
+| Training Materials | User guides, video tutorials, example scripts | End of Week 11 |
+| Knowledge Transfer Sessions | 3 interactive training sessions (2 hours each) | Week 12 |
+| Final Project Report | Summary, metrics, recommendations | End of Week 12 |
+## Page 4
+4. ASSUMPTIONS & DEPENDENCIES
+### 4.1 Assumptions
+- Client will provide access to all existing TestStack.White codebases
+- Test environments and applications under test will be available throughout the project
+- Client team will be available for clarifications and validation
+- All necessary licenses and tools will be provided by the client
+- Current test data and test environments are stable and accessible
+### 4.2 Dependencies
+- Timely access to source code repositories
+- Availability of subject matter experts from the client side
+- Test environment availability during migration and testing phases
+- Approval cycles will not exceed 3 business days
+- No major application updates during the migration period
+5. PROJECT TIMELINE
+**Total Duration: 12 Weeks**
+- **Weeks 1-2:** Assessment & Planning
+- **Weeks 3-4:** Framework Development
+- **Weeks 5-8:** Test Case Migration
+- **Weeks 9-10:** Testing & Validation
+- **Weeks 11-12:** Documentation & Knowledge Transfer
+**Key Milestones:**
+- Week 2: Migration strategy approved
+- Week 4: Framework ready for migration
+- Week 8: All scripts migrated
+- Week 10: Validation complete
+- Week 12: Project closure
+## Page 5
+6. ROLES & RESPONSIBILITIES
+### 6.1 Vendor/Service Provider Responsibilities
+- Provide experienced automation engineers for migration work
+- Develop and deliver all project deliverables
+- Conduct regular status meetings and progress updates
+- Provide technical support during knowledge transfer period
+- Deliver quality assurance for all migrated scripts
+### 6.2 Client Responsibilities
+- Provide access to existing codebase and documentation
+- Make test environments and applications available
+- Assign SMEs for knowledge sharing and validation
+- Review and approve deliverables within agreed timelines
+- Participate in training and knowledge transfer sessions
+- Provide feedback and clarifications as needed
+7. ACCEPTANCE CRITERIA
+Each deliverable will be accepted based on the following criteria:
+1. **Migrated Test Scripts:**
+ - All existing test cases successfully converted to FlaUI
+ - Test execution success rate ≥ 95%
+ - No degradation in test coverage
+ - Code follows agreed-upon standards
+2. **Framework Architecture:**
+ - Modular and maintainable code structure
+ - Proper error handling and logging implemented
+ - CI/CD integration functional
+ - Performance meets or exceeds current framework
+3. **Documentation:**
+## Page 6
+- Comprehensive and easy to understand
+- Includes code examples and use cases
+- Covers troubleshooting and FAQs
+- Approved by client technical leads
+4. Knowledge Transfer:
+ - Team members can independently maintain scripts
+ - Training session feedback scores ≥ 4/5
+ - Q&A sessions completed
+### 8. PAYMENT TERMS
+**Total Project Cost:** [Insert Amount]
+**Payment Schedule:**
+- 20% upon SOW signing and project kickoff
+- 30% upon completion of Phase 2 (Framework Development)
+- 30% upon completion of Phase 3 (Test Case Migration)
+- 20% upon final acceptance and project closure
+**Payment Method:** [Specify method]
+**Invoice Terms:** Net 30 days
+### 9. CHANGE MANAGEMENT
+Any changes to the scope, timeline, or deliverables must be documented through a formal Change Request process:
+1. Change request submitted in writing
+2. Impact analysis conducted (time, cost, resources)
+3. Approval from both parties required
+4. SOW amended with updated details
+5. Work proceeds only after approval
+## Page 7
+10. RISK MANAGEMENT
+| Risk | Impact | Mitigation Strategy |
+|-------------------------------------------|--------|----------------------------------------------------------|
+| Complex legacy code difficult to migrate | High | Early assessment, allocate buffer time |
+| Test environment instability | Medium | Request stable environments, use test data snapshots |
+| Key personnel unavailability | Medium | Cross-train team members, maintain documentation |
+| Undocumented TestStack.White customizations | High | Conduct thorough code review, engage original developers |
+| Application changes during migration | High | Freeze application updates during migration period |
+11. TERMS & CONDITIONS
+- All intellectual property created during this project belongs to the Client
+- Both parties agree to maintain confidentiality of proprietary information
+- This SOW is valid for 90 days from the date of issue
+- Project governed by the Master Services Agreement between parties
+- Either party may terminate with 30 days written notice with appropriate compensation
+12. SIGN-OFF
+**Client Approval:**
+Name: ________________________
+Title: ________________________
+Signature: ____________________
+Date: ________________________
+**Vendor Approval:**
+### Table 1
+| Risk | Impact | Mitigation Strategy |
+|---|---|---|
+| Complex legacy code difficult to migrate | High | Early assessment, allocate buffer time |
+| Test environment instability | Medium | Request stable environments, use test data snapshots |
+| Key personnel unavailability | Medium | Cross-train team members, maintain documentation |
+| Undocumented TestStack.White customizations | High | Conduct thorough code review, engage original developers |
+| Application changes during migration | High | Freeze application updates during migration period |
+## Page 8
+Name: ____________________
+Title: ____________________
+Signature: ____________________
+Date: ____________________
+### 13. APPENDICES
+**Appendix A:** Current Test Inventory List
+**Appendix B:** FlaUI vs TestStack.White Feature Comparison
+**Appendix C:** Technical Architecture Diagram
+**Appendix D:** Training Schedule
+**Appendix E:** Communication Plan'
+2025-12-15 22:47:11 | INFO     | __main__:run_doc_processor | Running parser for : test_data\sample sow.pdf with base_name: sample sow
+2025-12-15 22:47:11 | INFO     | backend.doc_insighter.core.llama_parsing:extract_all_text | Attempting to parse document: test_data\sample sow.pdf with LlamaCloudDocumentParser.
+2025-12-15 22:47:11 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Starting to parse: test_data\sample sow.pdf
+2025-12-15 22:47:22 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Successfully parsed test_data\sample sow.pdf - 8 pages in 11.45s
+2025-12-15 22:47:22 | INFO     | backend.doc_insighter.core.llama_parsing:extract_all_text | Successfully parsed: sample sow.pdf, Pages: 8
+2025-12-15 22:47:22 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Results saved to backend/temp/sample sow_parsed_results.json
+2025-12-15 22:47:22 | INFO     | __main__:extract_insights | Processing text input
+2025-12-15 22:47:22 | INFO     | __main__:extract_insights | Starting data extraction
+2025-12-15 22:47:38 | INFO     | __main__:extract_insights | Extraction completed successfully
+2025-12-15 22:47:38 | INFO     | __main__:run_doc_processor | SOW Document processed successfully
+2025-12-16 11:29:48 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-16 11:30:16 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-16 11:31:36 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-16 11:41:06 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-16 19:56:14 | INFO     | backend.doc_insighter.core.extraction_pipeline:run_doc_processor | Running parser for : test_data\sample sow.pdf with base_name: sample sow
+2025-12-16 19:56:14 | INFO     | backend.doc_insighter.core.llama_parsing:extract_all_text | Attempting to parse document: test_data\sample sow.pdf with LlamaCloudDocumentParser.
+2025-12-16 19:56:14 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Starting to parse: test_data\sample sow.pdf
+2025-12-16 19:56:28 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Successfully parsed test_data\sample sow.pdf - 8 pages in 14.09s
+2025-12-16 19:56:28 | INFO     | backend.doc_insighter.core.llama_parsing:extract_all_text | Successfully parsed: sample sow.pdf, Pages: 8
+2025-12-16 19:56:28 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Results saved to backend/temp/sample sow_parsed_results.json
+2025-12-16 19:56:28 | INFO     | backend.doc_insighter.core.extraction_pipeline:extract_insights | Processing text input
+2025-12-16 19:56:29 | INFO     | backend.doc_insighter.core.extraction_pipeline:extract_insights | Starting data extraction
+2025-12-16 19:56:31 | INFO     | backend.doc_insighter.core.extraction_pipeline:extract_insights | Extraction completed successfully
+2025-12-16 19:56:31 | INFO     | backend.doc_insighter.core.extraction_pipeline:run_doc_processor | SOW Document processed successfully
+2025-12-16 19:56:32 | WARNING  | backend.doc_insighter.services.sow:<module> | File not processed correctly. Error message - (psycopg2.errors.NotNullViolation) null value in column "id" of relation "project_documents" violates not-null constraint
+DETAIL:  Failing row contains (null, 561a6d34-08d4-4368-b203-1a5cc1e00d10, SOW, ```
+Thought: I need to analyze the provided document systematica..., 2025-12-16 14:25:50.529409).
+
+[SQL: INSERT INTO project_documents (project_id, content, document_type, created_at) VALUES (%(project_id)s::UUID, %(content)s, %(document_type)s, %(created_at)s) RETURNING project_documents.id]
+[parameters: {'project_id': '561a6d34-08d4-4368-b203-1a5cc1e00d10', 'content': '```\nThought: I need to analyze the provided document systematically and extract the required key insights specified by the user. The input content is already provided in readable text format, so I can directly process it without using the file_reader_tool.', 'document_type': 'SOW', 'created_at': datetime.datetime(2025, 12, 16, 14, 25, 50, 529409)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-12-16 19:57:33 | INFO     | backend.doc_insighter.core.extraction_pipeline:run_doc_processor | Running parser for : test_data\sample sow.pdf with base_name: sample sow
+2025-12-16 19:57:33 | INFO     | backend.doc_insighter.core.llama_parsing:extract_all_text | Attempting to parse document: test_data\sample sow.pdf with LlamaCloudDocumentParser.
+2025-12-16 19:57:33 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Starting to parse: test_data\sample sow.pdf
+2025-12-16 19:57:47 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Successfully parsed test_data\sample sow.pdf - 8 pages in 13.17s
+2025-12-16 19:57:47 | INFO     | backend.doc_insighter.core.llama_parsing:extract_all_text | Successfully parsed: sample sow.pdf, Pages: 8
+2025-12-16 19:57:47 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Results saved to backend/temp/sample sow_parsed_results.json
+2025-12-16 19:57:47 | INFO     | backend.doc_insighter.core.extraction_pipeline:extract_insights | Processing text input
+2025-12-16 19:57:47 | INFO     | backend.doc_insighter.core.extraction_pipeline:extract_insights | Starting data extraction
+2025-12-16 19:57:49 | INFO     | backend.doc_insighter.core.extraction_pipeline:extract_insights | Extraction completed successfully
+2025-12-16 19:57:49 | INFO     | backend.doc_insighter.core.extraction_pipeline:run_doc_processor | SOW Document processed successfully
+2025-12-16 19:57:49 | ERROR    | __main__:<module> | Unexpected error processing SOW: When initializing mapper Mapper[Project(projects)], expression 'RevenueMaster' failed to locate a name ('RevenueMaster'). If this is a class name, consider adding this relationship() to the <class 'backend.app.models.project.Project'> class after both dependent classes have been defined.
+2025-12-16 20:11:22 | INFO     | backend.doc_insighter.core.extraction_pipeline:run_doc_processor | Running parser for : test_data\sample sow.pdf with base_name: sample sow
+2025-12-16 20:11:22 | INFO     | backend.doc_insighter.core.llama_parsing:extract_all_text | Attempting to parse document: test_data\sample sow.pdf with LlamaCloudDocumentParser.
+2025-12-16 20:11:22 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Starting to parse: test_data\sample sow.pdf
+2025-12-16 20:11:31 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Successfully parsed test_data\sample sow.pdf - 8 pages in 9.47s
+2025-12-16 20:11:31 | INFO     | backend.doc_insighter.core.llama_parsing:extract_all_text | Successfully parsed: sample sow.pdf, Pages: 8
+2025-12-16 20:11:31 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Results saved to backend/temp/sample sow_parsed_results.json
+2025-12-16 20:11:31 | INFO     | backend.doc_insighter.core.extraction_pipeline:extract_insights | Processing text input
+2025-12-16 20:11:31 | INFO     | backend.doc_insighter.core.extraction_pipeline:extract_insights | Starting data extraction
+2025-12-16 20:11:44 | INFO     | backend.doc_insighter.core.extraction_pipeline:extract_insights | Extraction completed successfully
+2025-12-16 20:11:44 | INFO     | backend.doc_insighter.core.extraction_pipeline:run_doc_processor | SOW Document processed successfully
+2025-12-16 20:11:45 | WARNING  | __main__:<module> | File not processed correctly. Error message - (psycopg2.errors.NotNullViolation) null value in column "id" of relation "project_documents" violates not-null constraint
+DETAIL:  Failing row contains (null, 561a6d34-08d4-4368-b203-1a5cc1e00d10, SOW, {
+    "ProjectObjectivesAndTimeline": {
+        "Objectives": [
+..., 2025-12-16 14:41:21.864092).
+
+[SQL: INSERT INTO project_documents (project_id, content, document_type, created_at) VALUES (%(project_id)s::UUID, %(content)s, %(document_type)s, %(created_at)s) RETURNING project_documents.id]
+[parameters: {'project_id': '561a6d34-08d4-4368-b203-1a5cc1e00d10', 'content': '{\n    "ProjectObjectivesAndTimeline": {\n        "Objectives": [\n            "Migrate all existing TestStack.White automation scripts to FlaUI",\n  ... (8322 characters truncated) ... upon final acceptance and project closure"\n        ],\n        "PaymentMethod": "[Specify method]",\n        "InvoiceTerms": "Net 30 days"\n    }\n}', 'document_type': 'SOW', 'created_at': datetime.datetime(2025, 12, 16, 14, 41, 21, 864092)}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-12-16 21:44:30 | INFO     | backend.doc_insighter.core.extraction_pipeline:run_doc_processor | Running parser for : test_data\sample sow.pdf with base_name: sample sow
+2025-12-16 21:44:30 | INFO     | backend.doc_insighter.core.llama_parsing:extract_all_text | Attempting to parse document: test_data\sample sow.pdf with LlamaCloudDocumentParser.
+2025-12-16 21:44:30 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Starting to parse: test_data\sample sow.pdf
+2025-12-16 21:44:48 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Successfully parsed test_data\sample sow.pdf - 8 pages in 17.77s
+2025-12-16 21:44:48 | INFO     | backend.doc_insighter.core.llama_parsing:extract_all_text | Successfully parsed: sample sow.pdf, Pages: 8
+2025-12-16 21:44:48 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Results saved to backend/temp/sample sow_parsed_results.json
+2025-12-16 21:44:48 | INFO     | backend.doc_insighter.core.extraction_pipeline:extract_insights | Processing text input
+2025-12-16 21:44:48 | INFO     | backend.doc_insighter.core.extraction_pipeline:extract_insights | Starting data extraction
+2025-12-16 21:45:03 | INFO     | backend.doc_insighter.core.extraction_pipeline:extract_insights | Extraction completed successfully
+2025-12-16 21:45:03 | INFO     | backend.doc_insighter.core.extraction_pipeline:run_doc_processor | SOW Document processed successfully
+2025-12-16 21:45:05 | INFO     | __main__:<module> | File processed successfully and updated in db
+2025-12-16 23:22:56 | ERROR    | contextlib:__exit__ | Error while connecting db- 400: Invalid file format '.pdf'. Supported formats: {'.pdf', '.pptx', '.xlsx', '.xls', '.docx', '.doc'}
+2025-12-16 23:22:56 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-16 23:25:46 | ERROR    | contextlib:__exit__ | Error while connecting db- 400: Invalid file format '.pdf'. Supported formats: {'.pdf', '.pptx', '.xlsx', '.xls', '.docx', '.doc'}
+2025-12-16 23:25:46 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-16 23:25:56 | ERROR    | contextlib:__exit__ | Error while connecting db- 400: Invalid file format '.pdf'. Supported formats: {'.pdf', '.pptx', '.xlsx', '.xls', '.docx', '.doc'}
+2025-12-16 23:25:56 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-16 23:27:37 | ERROR    | contextlib:__exit__ | Error while connecting db- 400: Unsupported file type. Upload .xlsx or .csv
+2025-12-16 23:27:37 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-16 23:34:12 | ERROR    | contextlib:__exit__ | Error while connecting db- 400: Unsupported file type. Upload .xlsx or .csv
+2025-12-16 23:34:12 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-16 23:35:23 | INFO     | backend.doc_insighter.core.extraction_pipeline:run_doc_processor | Running parser for : backend\temp\20251216_233521_sample sow.pdf with base_name: 20251216_233521_sample sow
+2025-12-16 23:35:23 | INFO     | backend.doc_insighter.core.llama_parsing:extract_all_text | Attempting to parse document: backend\temp\20251216_233521_sample sow.pdf with LlamaCloudDocumentParser.
+2025-12-16 23:35:23 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Starting to parse: backend\temp\20251216_233521_sample sow.pdf
+2025-12-16 23:35:44 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Successfully parsed backend\temp\20251216_233521_sample sow.pdf - 8 pages in 20.88s
+2025-12-16 23:35:44 | INFO     | backend.doc_insighter.core.llama_parsing:extract_all_text | Successfully parsed: 20251216_233521_sample sow.pdf, Pages: 8
+2025-12-16 23:35:44 | INFO     | backend.doc_insighter.core.llama_parsing:run_parser | Results saved to backend/temp/20251216_233521_sample sow_parsed_results.json
+2025-12-16 23:35:44 | INFO     | backend.doc_insighter.core.extraction_pipeline:extract_insights | Processing text input
+2025-12-16 23:35:44 | INFO     | backend.doc_insighter.core.extraction_pipeline:extract_insights | Starting data extraction
+2025-12-16 23:35:57 | INFO     | backend.doc_insighter.core.extraction_pipeline:extract_insights | Extraction completed successfully
+2025-12-16 23:35:57 | INFO     | backend.doc_insighter.core.extraction_pipeline:run_doc_processor | SOW Document processed successfully
+2025-12-16 23:35:59 | INFO     | backend.utitlites.doc_importer:import_and_save_document | File processed successfully and updated in db
+2025-12-16 23:35:59 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 00:19:16 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 00:19:51 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 00:22:37 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 00:23:13 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 00:23:19 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 00:23:56 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 00:25:04 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 00:27:01 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 00:27:12 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 00:27:31 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 00:30:59 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 00:31:10 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 00:31:45 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 00:31:58 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 01:13:21 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 01:14:00 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 10:33:17 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 10:33:47 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 10:33:49 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 11:03:34 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 11:04:05 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 11:51:59 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 11:58:53 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:02:24 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:02:25 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:02:34 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:02:53 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:03:18 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:18:14 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:18:44 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:20:48 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:21:17 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:23:28 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:24:19 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:24:49 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:26:27 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:27:01 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:34:21 | ERROR    | contextlib:__exit__ | Error while connecting db- 400: Failed to fetch project summary: (psycopg2.errors.GroupingError) column "revenue_master.collection_date" must appear in the GROUP BY clause or be used in an aggregate function
+LINE 1: ..., 0) AS total_ai_assist_hours, EXTRACT(month FROM revenue_ma...
+                                                             ^
+
+[SQL: SELECT projects.id AS project_id, projects.name AS project_name, projects.account_id AS projects_account_id, accounts.name AS account_name, delivery_units.name AS delivery_unit_name, coalesce(sum(revenue_master.expected_revenue), %(coalesce_1)s) AS total_expected_rev, coalesce(sum(revenue_master.ytd_revenue), %(coalesce_2)s) AS total_ytd_rev, coalesce(sum(revenue_master.ai_direct_revenue), %(coalesce_3)s) AS total_ai_rev, coalesce(sum(revenue_master.ai_assisted_revenue), %(coalesce_4)s) AS total_ai_assist_rev, coalesce(sum(revenue_master.total_revenue), %(coalesce_5)s) AS total_revenue, coalesce(max(revenue_master.ai_direct_people), %(coalesce_6)s) AS ai_direct_people, coalesce(projects.ai_direct_hours, %(coalesce_7)s) AS total_ai_direct_hours, coalesce(projects.ai_assist_hours, %(coalesce_8)s) AS total_ai_assist_hours, EXTRACT(month FROM revenue_master.collection_date) AS month, EXTRACT(year FROM revenue_master.collection_date) AS year, projects.status AS project_status, projects.project_type AS project_type, projects.from_date AS projects_from_date, projects.to_date AS projects_to_date 
+FROM projects LEFT OUTER JOIN accounts ON projects.account_id = accounts.id LEFT OUTER JOIN delivery_units ON accounts.delivery_unit_id = delivery_units.id LEFT OUTER JOIN revenue_master ON projects.id = revenue_master.project_id 
+WHERE true GROUP BY projects.id, projects.name, projects.account_id, accounts.name, delivery_units.name, projects.status, projects.project_type ORDER BY projects.created_at DESC]
+[parameters: {'coalesce_1': 0, 'coalesce_2': 0, 'coalesce_3': 0, 'coalesce_4': 0, 'coalesce_5': 0, 'coalesce_6': 0, 'coalesce_7': 0, 'coalesce_8': 0}]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-12-17 12:34:21 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:34:50 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:35:18 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:39:13 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:39:55 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:40:03 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:40:40 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:45:58 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 12:46:34 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 13:15:04 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 13:15:41 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 14:25:23 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 14:25:54 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 17:10:46 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 17:14:14 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 17:14:33 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 17:14:48 | ERROR    | contextlib:__exit__ | Error while connecting db- [{'type': 'datetime_from_date_parsing', 'loc': ('query', 'start_date'), 'msg': 'Input should be a valid datetime or date, invalid character in year', 'input': '"2025-10-01"', 'ctx': {'error': 'invalid character in year'}}]
+2025-12-17 17:14:48 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 17:18:39 | ERROR    | contextlib:__exit__ | Error while connecting db- [{'type': 'datetime_from_date_parsing', 'loc': ('query', 'start_date'), 'msg': 'Input should be a valid datetime or date, invalid character in year', 'input': '"2025-10-01"', 'ctx': {'error': 'invalid character in year'}}]
+2025-12-17 17:18:39 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 17:19:21 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 17:20:31 | ERROR    | contextlib:__exit__ | Error while connecting db- [{'type': 'datetime_from_date_parsing', 'loc': ('query', 'start_date'), 'msg': 'Input should be a valid datetime or date, unexpected extra characters at the end of the input', 'input': '2025-09-01?end_date =2025-10-01', 'ctx': {'error': 'unexpected extra characters at the end of the input'}}]
+2025-12-17 17:20:31 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 17:20:40 | ERROR    | contextlib:__exit__ | Error while connecting db- [{'type': 'datetime_from_date_parsing', 'loc': ('query', 'start_date'), 'msg': 'Input should be a valid datetime or date, unexpected extra characters at the end of the input', 'input': '2025-09-01? end_date =2025-10-01', 'ctx': {'error': 'unexpected extra characters at the end of the input'}}]
+2025-12-17 17:20:40 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 17:20:45 | ERROR    | contextlib:__exit__ | Error while connecting db- [{'type': 'datetime_from_date_parsing', 'loc': ('query', 'start_date'), 'msg': 'Input should be a valid datetime or date, unexpected extra characters at the end of the input', 'input': '2025-09-01 end_date =2025-10-01', 'ctx': {'error': 'unexpected extra characters at the end of the input'}}]
+2025-12-17 17:20:45 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 17:20:50 | ERROR    | contextlib:__exit__ | Error while connecting db- [{'type': 'datetime_from_date_parsing', 'loc': ('query', 'start_date'), 'msg': 'Input should be a valid datetime or date, unexpected extra characters at the end of the input', 'input': '2025-09-01end_date =2025-10-01', 'ctx': {'error': 'unexpected extra characters at the end of the input'}}]
+2025-12-17 17:20:50 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 17:20:56 | ERROR    | contextlib:__exit__ | Error while connecting db- [{'type': 'datetime_from_date_parsing', 'loc': ('query', 'start_date'), 'msg': 'Input should be a valid datetime or date, unexpected extra characters at the end of the input', 'input': '2025-09-01, end_date =2025-10-01', 'ctx': {'error': 'unexpected extra characters at the end of the input'}}]
+2025-12-17 17:20:56 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 17:21:18 | ERROR    | contextlib:__exit__ | Error while connecting db- [{'type': 'datetime_from_date_parsing', 'loc': ('query', 'start_date'), 'msg': 'Input should be a valid datetime or date, unexpected extra characters at the end of the input', 'input': '2025-09-01; end_date =2025-10-01', 'ctx': {'error': 'unexpected extra characters at the end of the input'}}]
+2025-12-17 17:21:18 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 17:21:26 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 17:24:10 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 17:59:38 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 18:00:36 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 18:10:24 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 18:16:39 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-17 18:33:38 | DEBUG    | contextlib:__exit__ | Closeing DB Connection

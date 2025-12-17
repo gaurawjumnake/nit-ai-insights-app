@@ -3,15 +3,14 @@ import json
 import time
 from typing import List, Dict, Any, Optional
 from pathlib import Path
-import logging
+from backend.doc_insighter.tools.app_logger import Logger
+log = Logger()
 from dataclasses import dataclass, asdict
 from rich import print
 from dotenv import load_dotenv
 from llama_parse import LlamaParse
 from llama_parse.base import ResultType
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
+load_dotenv(override=True)
 
 @dataclass
 class ParsedPage:
@@ -31,11 +30,16 @@ class ParsedDocument:
     processing_time: float
 
 class LlamaCloudDocumentParser:
-    SUPPORTED_EXTENSIONS = {'.pdf', '.pptx', '.xlsx', '.xls', '.docx', '.doc'}
+    SUPPORTED_EXTENSIONS = os.getenv("SUPPORTED_DOC_TYPE_EXTENSIONS")
 
-    def __init__(self, api_key: str, max_timeout: int = 300):
-        self.api_key = api_key
+    def __init__(self, max_timeout: int = 300):
+        api_key = os.getenv("LLAMA_CLOUD_API_KEY")
+        if not api_key:
+            log.log_error("LLAMA_CLOUD_API_KEY not found in environment variables.")
+            return []
+        
         self.max_timeout = max_timeout
+        self.save_parsed_file_path = os.getenv("TEMP_DIR") + "/" #type:ignore
         
         self.parser = LlamaParse(
             api_key=api_key,
@@ -76,30 +80,30 @@ class LlamaCloudDocumentParser:
                 While performing the analysis requested above, **DO NOT** create your own headers like "## Visual Elements", "## Design Elements", or "## Contextual Information" in the final text.
                 Instead, integrate your findings naturally. For example, represent visuals using Markdown image syntax: `![A concise description of the chart or image.]`. Your output should be a direct, clean transcription of the document.
                 """
-        )
+        ) # type:ignore
         self.results = []
     
     def is_supported_file(self, file_path: str) -> bool:
-        return Path(file_path).suffix.lower() in self.SUPPORTED_EXTENSIONS
+        return Path(file_path).suffix.lower() in self.SUPPORTED_EXTENSIONS # type:ignore
     
     def parse_single_document(self, file_path: str) -> Optional[ParsedDocument]:
         start_time = time.time()
         
         if not os.path.exists(file_path):
-            logger.error(f"File not found: {file_path}")
+            log.log_error(f"File not found: {file_path}")
             return None
         
         if not self.is_supported_file(file_path):
-            logger.error(f"Unsupported file type: {file_path}")
+            log.log_error(f"Unsupported file type: {file_path}")
             return None
         
         try:
-            logger.info(f"Starting to parse: {file_path}")
+            log.log_info(f"Starting to parse: {file_path}")
             
             documents = self.parser.load_data(file_path)
             
             if not documents:
-                logger.error(f"No content extracted from: {file_path}")
+                log.log_error(f"No content extracted from: {file_path}")
                 return None
             
             parsed_pages = self._process_pages_with_lvm(documents, file_path)
@@ -117,11 +121,11 @@ class LlamaCloudDocumentParser:
             
             self.results.append(parsed_doc)
             
-            logger.info(f"Successfully parsed {file_path} - {len(parsed_pages)} pages in {processing_time:.2f}s")
+            log.log_info(f"Successfully parsed {file_path} - {len(parsed_pages)} pages in {processing_time:.2f}s")
             return parsed_doc
             
         except Exception as e:
-            logger.error(f"Error parsing {file_path}: {str(e)}")
+            log.log_error(f"Error parsing {file_path}: {str(e)}")
             return None
     
     def _process_pages_with_lvm(self, documents: List, file_path: str) -> List[ParsedPage]:
@@ -145,7 +149,7 @@ class LlamaCloudDocumentParser:
                 parsed_pages.append(parsed_page)
                 
             except Exception as e:
-                logger.warning(f"Error processing page {idx + 1}: {str(e)}")
+                log.log_warning(f"Error processing page {idx + 1}: {str(e)}")
                 continue
         
         return parsed_pages
@@ -182,6 +186,9 @@ class LlamaCloudDocumentParser:
         lines = content.split('\n')
         current_section = None
         
+        # Track processed table indices to avoid duplicates
+        processed_table_indices = set()
+
         for i, line in enumerate(lines):
             line_lower = line.lower().strip()
             
@@ -203,11 +210,26 @@ class LlamaCloudDocumentParser:
                 }
                 analysis['images'].append(image_info)
             
-            elif '|' in line and len(line.split('|')) > 2:
-                if not any(table['position'] == i for table in analysis['tables']):
-                    table_data = self._extract_enhanced_table_data(lines, i)
-                    if table_data:
-                        analysis['tables'].append(table_data)
+            elif '|' in line and len(line.split('|')) > 2 and i not in processed_table_indices:
+                # if not any(table['position'] == i for table in analysis['tables']):
+                #     # table_data = self._extract_enhanced_table_data(lines, i)
+                #     if table_data:
+                #         analysis['tables'].append(table_data)
+                all_tables = self._extract_all_tables(lines)  # Returns List[Dict]
+                if all_tables:
+                    # Add all extracted tables
+                    for table_data in all_tables:
+                        if table_data and table_data not in analysis['tables']:
+                            analysis['tables'].append(table_data)
+                            
+                            # Mark all indices as processed
+                            start_idx = table_data.get('position', i)
+                            end_idx = table_data.get('end_index', i)
+                            for idx in range(start_idx, end_idx + 1):
+                                processed_table_indices.add(idx)
+                
+                # Skip to end of table to avoid reprocessing
+                break
         
         if file_type == '.pptx':
             slide_analysis = self._analyze_slide_with_lvm(content)
@@ -454,7 +476,7 @@ class LlamaCloudDocumentParser:
         results = []
         
         for file_path in file_paths:
-            logger.info(f"Processing file {len(results) + 1}/{len(file_paths)}: {file_path}")
+            log.log_info(f"Processing file {len(results) + 1}/{len(file_paths)}: {file_path}")
             
             parsed_doc = self.parse_single_document(file_path)
             if parsed_doc:
@@ -478,20 +500,21 @@ class LlamaCloudDocumentParser:
                 if os.path.isfile(file_path) and self.is_supported_file(file_path):
                     file_paths.append(file_path)
         
-        logger.info(f"Found {len(file_paths)} supported documents to parse")
+        log.log_info(f"Found {len(file_paths)} supported documents to parse")
         return self.parse_multiple_documents(file_paths)
     
     def save_results(self, output_file: str = "parsed_results.json"):
         try:
             results_dict = [asdict(result) for result in self.results]
-            
+            output_file = os.path.join(self.save_parsed_file_path + output_file) #type:ignore
+
             with open(output_file, 'w', encoding='utf-8') as f:
                 json.dump(results_dict, f, indent=2, ensure_ascii=False)
             
-            logger.info(f"Results saved to {output_file}")
+            log.log_info(f"Results saved to {output_file}")
             
         except Exception as e:
-            logger.error(f"Error saving results: {str(e)}")
+            log.log_error(f"Error saving results: {str(e)}")
     
     def get_summary_statistics(self) -> Dict[str, Any]:
         if not self.results:
@@ -521,53 +544,183 @@ class LlamaCloudDocumentParser:
         
         return stats
 
-def parser_main(modified_name: str, file_path: str) -> List[Dict[str, Any]]:
-    load_dotenv(override=True)
-    API_KEY = os.getenv("LLAMA_CLOUD_API_KEY")
-
-    if not API_KEY:
-        logger.error("LLAMA_CLOUD_API_KEY not found in environment variables.")
-        return []
-
-    parser = LlamaCloudDocumentParser(api_key=API_KEY)
-    logger.info(f"Attempting to parse document: {file_path} with LlamaCloudDocumentParser.")
-
-    single_doc_object = parser.parse_single_document(file_path)
-
-    if single_doc_object:
-        logger.info(f"Successfully parsed: {single_doc_object.filename}, Pages: {single_doc_object.total_pages}")
-        parser.save_results(f"{modified_name}_parsed_results.json")
-        return [asdict(single_doc_object)]
-    else:
-        logger.error(f"Failed to parse document: {file_path}")
-        return []
-
-
-if __name__ == "__main__":
-    current_script_dir = Path(__file__).parent.resolve()
-    test_eoc_path = current_script_dir / "SOB.pdf"
-
-    if not test_eoc_path.exists():
-        logger.error(f"Test SOB file not found at: {test_eoc_path}")
-        logger.error("Please ensure the test file 'SOB.pdf' exists in the same directory as the script or update the path.")
-    else:
-        base_name = test_eoc_path.stem
-        logger.info(f"Running parser_main for test file: {test_eoc_path} with base_name: {base_name}")
+    def _extract_all_tables(self, lines: List[str]) -> List[Dict[str, Any]]:
+        """Extract all tables from lines, avoiding duplicates."""
+        tables = []
+        i = 0
+        processed_indices = set()
         
-        parsed_data_list = parser_main(modified_name=base_name, file_path=str(test_eoc_path))
+        while i < len(lines):
+            line = lines[i].strip()
+            
+            # Skip if already processed
+            if i in processed_indices:
+                i += 1
+                continue
+            
+            # Check if line is a table row (contains pipes and multiple cells)
+            if '|' in line and len(line.split('|')) > 2:
+                # Found start of a table
+                table_data = self._extract_single_table(lines, i, processed_indices)
+                if table_data:
+                    tables.append(table_data)  # Append Dict, not List
+                    # Move to end of table
+                    i = table_data.get('end_index', i) + 1
+                else:
+                    i += 1
+            else:
+                i += 1
         
-        if parsed_data_list:
-            logger.info(f"parser_main returned {len(parsed_data_list)} document(s).")
-            if parsed_data_list[0]:
-                logger.info("Sample of parsed data (first document):")
-                doc_sample = parsed_data_list[0]
-                summary_info = {
-                    "filename": doc_sample.get("filename"),
-                    "file_type": doc_sample.get("file_type"),
-                    "total_pages": doc_sample.get("total_pages"),
-                    "num_pages_data": len(doc_sample.get("pages", [])),
-                    "first_page_text_preview": doc_sample.get("pages", [{}])[0].get("text_content", "")[:200] + "..." if doc_sample.get("pages") else "N/A"
-                }
-                print(json.dumps(summary_info, indent=2))
+        return tables  # Returns List[Dict[str, Any]]
+    
+    def _extract_single_table(self, lines: List[str], start_index: int, processed_indices: set) -> Optional[Dict[str, Any]]:
+        """Extract a single complete table and mark lines as processed."""
+        table_lines = []
+        i = start_index
+        
+        # Collect all consecutive table rows
+        while i < len(lines):
+            line = lines[i].strip()
+            
+            # Check if it's a table row (contains pipes)
+            if '|' in line and len(line.split('|')) > 2:
+                table_lines.append(line)
+                processed_indices.add(i)
+                i += 1
+            elif not line:
+                # Empty line, might continue table
+                i += 1
+            else:
+                # Non-table content, end of table
+                break
+        
+        if len(table_lines) < 1:  # Changed from < 2 to < 1
+            return None
+        
+        # Parse table
+        headers = [cell.strip() for cell in table_lines[0].split('|') if cell.strip()]
+        rows = []
+        
+        # Skip separator line (second row if it contains dashes)
+        start_data_row = 1
+        if len(table_lines) > 1 and all('-' in cell or '=' in cell or not cell.strip() for cell in table_lines[1].split('|')):
+            start_data_row = 2
+        
+        # Extract data rows
+        for line_idx in range(start_data_row, len(table_lines)):
+            line = table_lines[line_idx]
+            
+            # Skip separator rows (rows that are all dashes/equals)
+            cells = [cell.strip() for cell in line.split('|')]
+            if all(not cell or all(c in '-=' for c in cell) for cell in cells):
+                continue
+            
+            row_data = [cell.strip() for cell in cells if cell.strip()]
+            if row_data:
+                rows.append(row_data)
+        
+        if not rows and len(headers) == 0:
+            return None
+        
+        # Return single table entry as Dict
+        return {
+            'position': start_index,
+            'end_index': i - 1,
+            'headers': headers,
+            'row_count': len(rows),
+            'column_count': len(headers),
+            'data': rows,
+            'full_table': table_lines
+        }
+
+    def run_parser(self, modified_name: str, file_path: str) -> List[Dict[str, Any]]:
+        log.log_info(f"Attempting to parse document: {file_path} with LlamaCloudDocumentParser.")
+
+        single_doc_object = self.parse_single_document(file_path)
+
+        if single_doc_object:
+            log.log_info(f"Successfully parsed: {single_doc_object.filename}, Pages: {single_doc_object.total_pages}")
+            self.save_results(f"{modified_name}_parsed_results.json")
+            return [asdict(single_doc_object)]
         else:
-            logger.info("parser_main returned no data.")
+            log.log_error(f"Failed to parse document: {file_path}")
+            return []
+
+    def extract_all_text(self, modified_name: str, file_path: str) -> str:
+        """
+        Extract all text content from parsed document in reading order.
+        
+        Args:
+            parsed_document: Single document dict from parsed_results.json
+            
+        Returns:
+            Combined text from all pages and tables
+        """
+        parsed_data = self.run_parser(modified_name, file_path)        
+
+        all_text = []
+        
+        # Extract filename as context
+        filename = parsed_data[0].get('filename', 'Unknown Document')
+        all_text.append(f"# Document: {filename}\n")
+        
+        # Process each page
+        pages = parsed_data[0].get('pages', [])
+        
+        for page in pages:
+            page_num = page.get('page_number', 'Unknown')
+            all_text.append(f"\n## Page {page_num}\n")
+            
+            # Extract text content
+            text_content = page.get('text_content', '').strip()
+            if text_content:
+                all_text.append(text_content)
+            
+            # Extract table data
+            tables = page.get('tables', [])
+            for table_idx, table in enumerate(tables, 1):
+                all_text.append(f"\n### Table {table_idx}\n")
+                
+                # Add headers
+                headers = table.get('headers', [])
+                if headers:
+                    all_text.append("| " + " | ".join(headers) + " |\n")
+                    all_text.append("|" + "|".join(["---"] * len(headers)) + "|\n")
+                
+                # Add data rows
+                data = table.get('data', [])
+                for row in data:
+                    all_text.append("| " + " | ".join(str(cell) for cell in row) + " |\n")
+        
+        return "\n".join(all_text)
+
+# if __name__ == "__main__":
+#     parser = LlamaCloudDocumentParser()
+
+#     current_script_dir = Path(__file__).parent.resolve()
+#     test_eoc_path = Path("test_data/sample sow.pdf")
+
+#     if not test_eoc_path.exists():
+#         log.log_error(f"Test SOB file not found at: {test_eoc_path}")
+#         log.log_error("Please ensure the test file 'SOB.pdf' exists in the same directory as the script or update the path.")
+#     else:
+#         base_name = test_eoc_path.stem
+#         log.log_info(f"Running parser_main for test file: {test_eoc_path} with base_name: {base_name}")
+        
+#         parsed_data_list = parser.run_parser(modified_name=base_name, file_path=str(test_eoc_path))
+        
+#         if parsed_data_list:
+#             log.log_info(f"parser_main returned {len(parsed_data_list)} document(s).")
+#             if parsed_data_list[0]:
+#                 log.log_info("Sample of parsed data (first document):")
+#                 doc_sample = parsed_data_list[0]
+#                 summary_info = {
+#                     "filename": doc_sample.get("filename"),
+#                     "file_type": doc_sample.get("file_type"),
+#                     "total_pages": doc_sample.get("total_pages"),
+#                     "num_pages_data": len(doc_sample.get("pages", [])),
+#                     "first_page_text_preview": doc_sample.get("pages", [{}])[0].get("text_content", "")[:200] + "..." if doc_sample.get("pages") else "N/A"
+#                 }
+#                 print(json.dumps(summary_info, indent=2))
+#         else:
+#             log.log_info("parser_main returned no data.")

@@ -8,7 +8,7 @@ class ProjectDocumentOut(BaseModel):
     project_id : UUID
     content : Optional[str] = None
     document_type : Optional[str] = None
-    created_at = datetime
+    created_at : datetime
 
     class Config:
         from_attributes = True

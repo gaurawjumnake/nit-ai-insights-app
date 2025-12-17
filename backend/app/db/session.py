@@ -4,7 +4,7 @@ from sqlalchemy.orm import sessionmaker
 from backend.app.core.config import settings
 import os
 import psycopg2
-from backend.ai_engine.tools.app_logger import Logger
+from backend.doc_insighter.tools.app_logger import Logger
 log = Logger()
 
 engine = create_engine(

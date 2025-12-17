@@ -6,7 +6,7 @@ import csv
 from pathlib import Path
 from langchain_text_splitters import RecursiveJsonSplitter, RecursiveCharacterTextSplitter
 from pydantic import BaseModel, Field
-from backend.ai_engine.tools.app_logger import Logger
+from backend.doc_insighter.tools.app_logger import Logger
 log = Logger()
 
 class FileReaderInput(BaseModel):
