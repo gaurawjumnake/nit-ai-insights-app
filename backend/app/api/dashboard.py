@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException,status
 from sqlalchemy.orm import Session
 from typing import Optional, List
+from datetime import datetime
 from backend.app.db.session import get_db
 from backend.app.services.dashboard_services import MasterSummary
 from backend.app.services.account import get_account_revenue_summary
@@ -22,8 +23,8 @@ async def get_data(db: Session = Depends(get_db) ,
         project_name: Optional[str] = None,
         project_status: Optional[str] = None,
         project_type: Optional[str] = None,
-        month: Optional[int] = None,
-        year: Optional[int] = None,
+        start_date: Optional[datetime] = None,
+        end_date: Optional[datetime] = None,
         delivery_unit_name: Optional[str] = None
     ):
     summary = MasterSummary()
@@ -33,8 +34,8 @@ async def get_data(db: Session = Depends(get_db) ,
                                                     project_name,
                                                     project_status,
                                                     project_type,
-                                                    month,
-                                                    year,
+                                                    start_date,
+                                                    end_date,
                                                     delivery_unit_name)
         return response
     except ValueError as ve:

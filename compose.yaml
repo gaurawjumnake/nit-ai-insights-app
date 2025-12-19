@@ -1,0 +1,6 @@
+services:
+  nitaiinsightsapp:
+    image: nitaiinsightsapp
+    build:
+      context: .
+      dockerfile: ./Dockerfile

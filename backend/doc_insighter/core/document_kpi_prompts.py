@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-class SOW_KPI:
+class SOW:
     prompt = """
     Extract below given key insights from provided data
         - Clear project objectives and timeline
@@ -12,12 +12,12 @@ class SOW_KPI:
         - Payment terms
     """
 
-class WSR_KPI:
+class WSR:
     prompt = """
 
     """
 
-class TechReview_KPI:
+class TechReview:
     prompt = """
 
     """

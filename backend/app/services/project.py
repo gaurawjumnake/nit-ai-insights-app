@@ -5,6 +5,7 @@ from uuid import UUID as _UUID
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import func, and_, extract, text
 
+from backend.utitlites.app_utilites import safe_float, safe_int
 from backend.app.models.project import Project
 from backend.app.models.account import Account
 from backend.app.models.revenue import RevenueMaster
@@ -225,12 +226,12 @@ def update_project(db: Session, project_id: UUID, project_data: ProjectUpdate) -
         
         revenue_entry = db.query(RevenueMaster).filter(RevenueMaster.project_id == project_id).first()
         if revenue_entry:
-            db_project.expected_revenue = float(revenue_entry.expected_revenue or 0)
-            db_project.ytd_revenue = float(revenue_entry.ytd_revenue or 0)
-            db_project.ai_revenue = float(revenue_entry.ai_direct_revenue or 0)
-            db_project.ai_assisted_revenue = float(revenue_entry.ai_assisted_revenue or 0)
-            db_project.total_ai_revenue = float(revenue_entry.total_ai_revenue or 0)
-            db_project.total_revenue = float(revenue_entry.total_revenue or 0)
+            db_project.expected_revenue = safe_float(revenue_entry.expected_revenue)
+            db_project.ytd_revenue = safe_float(revenue_entry.ytd_revenue )
+            db_project.ai_revenue = safe_float(revenue_entry.ai_direct_revenue )
+            db_project.ai_assisted_revenue = safe_float(revenue_entry.ai_assisted_revenue )
+            db_project.total_ai_revenue = safe_float(revenue_entry.total_ai_revenue )
+            db_project.total_revenue = safe_float(revenue_entry.total_revenue)
 
         try:
             db.execute(text("SELECT refresh_account_metrics_mv();"))

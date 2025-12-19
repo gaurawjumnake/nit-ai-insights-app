@@ -6,6 +6,7 @@ from backend.app.api import project as project_api
 from backend.app.api import import_data as import_api
 # from backend.app.api import data_extractor as sow_extractor_api
 from backend.app.api import export_data as export_api
+# from backend.doc_insighter.api import sow as sow_api
 from backend.app.api import dashboard as dashboard_api
 from backend.app.db.base import Base  
 from backend.app.db.session import engine
@@ -24,6 +25,7 @@ app.include_router(import_api.router, prefix="/v1")
 app.include_router(dashboard_api.router, prefix="/v1")
 # app.include_router(sow_extractor_api.router,  prefix="/v1")
 app.include_router(export_api.router, prefix="/v1")
+# app.include_router(sow_api.router,  prefix="/v1")
 
 # Call the function to initialize tables. 
 # init_db()

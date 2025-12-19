@@ -2,15 +2,15 @@ import pandas as pd
 import pymupdf4llm
 import os
 from crewai import Agent, Task, Crew, Process
-from backend.ai_engine.tools.file_reader_tool import CustomFileReaderTool
+from backend.doc_insighter.tools.file_reader_tool import CustomFileReaderTool
 from pathlib import Path
-from backend.ai_engine.tools.llm_models import llm
+from backend.doc_insighter.tools.llm_models import llm
 from pydantic import BaseModel
 from typing import Optional
 from dotenv import load_dotenv
 load_dotenv()
 
-from backend.ai_engine.tools.app_logger import Logger
+from backend.doc_insighter.tools.app_logger import Logger
 log = Logger()
 
 class ResponseModel(BaseModel):
@@ -98,9 +98,9 @@ class DataExtractor_1:
 
 import pymupdf4llm
 from crewai import Agent, Task, Crew, Process
-from backend.ai_engine.tools.file_reader_tool import CustomFileReaderTool
-from backend.ai_engine.tools.llm_models import llm
-from backend.ai_engine.tools.app_logger import Logger
+from backend.doc_insighter.tools.file_reader_tool import CustomFileReaderTool
+from backend.doc_insighter.tools.llm_models import llm
+from backend.doc_insighter.tools.app_logger import Logger
 from pydantic import BaseModel
 from typing import Optional, Any, Dict, List
 from dotenv import load_dotenv
