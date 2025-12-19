@@ -2,12 +2,12 @@ from pydantic import BaseModel, Field, computed_field
 from typing import Optional, List
 from datetime import datetime
 from uuid import UUID
-
+from backend.app.schemas.delivery_unit import DeliveryUnitOut
 
 class ProjectBase(BaseModel):
     name: str = Field(..., description="The project name.")
     account_id: UUID = Field(..., description="Foreign key linking to the Account.")
-    delivery_unit_id: UUID = Field(..., description="Foreign key linking to the Account.")
+    delivery_unit_id: UUID = Field(..., description="Foreign key linking to the Delivery Unit.")
     overview: Optional[str] = None
     status: Optional[str] = "active"
     # ai_direct_people: Optional[int] = 0
@@ -127,15 +127,65 @@ class ProjectSummary(BaseModel):
             return (total_ai / total_rev) * 100
         return 0.0
 
-class ProjectExport(BaseModel):
+class ProjectOut_Export(ProjectBase):
+    id: UUID
+    created_at: Optional[datetime] = None
+    account: Optional[AccountOut] = None
+    delivery_unit: Optional[DeliveryUnitOut] = None
+    expected_revenue: Optional[float] = 0.0
+    ytd_revenue: Optional[float] = 0.0
+    ai_revenue: Optional[float] = 0.0  
+    ai_assisted_revenue: Optional[float] = 0.0
+    total_ai_revenue: Optional[float] = 0.0
+    total_revenue: Optional[float] = 0.0
+    
+    @computed_field
+    @property
+    def ai_penetration(self) -> float:
+        """AI revenue as a percentage of total revenue."""
+        total_rev = self.total_revenue or 0
+        ai_total = (self.ai_revenue or 0) + (self.ai_assisted_revenue or 0)
+        if total_rev > 0 and ai_total > 0:
+            return (ai_total / total_rev) * 100
+        return 0.0
+
+    class Config:
+        from_attributes = True
+
+
+class ProjectExport(ProjectBase):
+    """Schema for exporting project data with flattened names."""
+    
+    # 1. We keep the main fields
+    id: UUID
     name: str = Field(..., description="The project name.")
-    account_id: UUID = Field(..., description="Foreign key linking to the Account.")
-    delivery_unit_id: UUID = Field(..., description="Foreign key linking to the Account.")
+    account_id: UUID
+    delivery_unit_id: UUID
+    
+    # 2. We add HIDDEN fields to catch the database relationships.
+    # exclude=True means the entire nested object won't be in the JSON, 
+    # but we can use it to calculate the names.
+    account: Optional[AccountOut] = Field(default=None, exclude=True)
+    delivery_unit: Optional[DeliveryUnitOut] = Field(default=None, exclude=True)
+
+    # 3. We use @computed_field to extract the names from the hidden fields
+    @computed_field
+    @property
+    def account_name(self) -> Optional[str]:
+        if self.account:
+            return self.account.name
+        return None
+
+    @computed_field
+    @property
+    def delivery_unit_name(self) -> Optional[str]:
+        if self.delivery_unit:
+            return self.delivery_unit.name
+        return None
+
+    # ... (Include the rest of your fields: overview, status, metrics, etc.) ...
     overview: Optional[str] = None
     status: Optional[str] = "active"
-    delivery_uni_name: Optional[str] = None
-    account_name: Optional[str] = None
-    # ai_direct_people: Optional[int] = 0
     ai_direct_hours: Optional[float] = 0.0
     ai_assist_hours: Optional[float] = 0.0
     tech_stack: Optional[List[str]] = None
@@ -147,3 +197,5 @@ class ProjectExport(BaseModel):
     expected_win_date: Optional[datetime] = None
     expected_outcome: Optional[str] = None
     code_coverage_pct: Optional[float] = 0.0
+    class Config:
+        from_attributes = True

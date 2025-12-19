@@ -1,8 +1,11 @@
-from pydantic import BaseModel, Field, computed_field
+from pydantic import BaseModel, Field, computed_field,field_validator,model_validator
 from typing import Optional
 from uuid import UUID
 from datetime import datetime
-
+import math
+from backend.app.schemas.account import AccountOut
+from backend.app.schemas.project import ProjectOut_Export
+from backend.app.schemas.delivery_unit import DeliveryUnitOut
 
 class RevenueBase(BaseModel):
     project_id: UUID = Field(..., description="Foreign key linking to the Project.")
@@ -103,20 +106,75 @@ class RevenueSummary(BaseModel):
             return (ai_rev / total_rev) * 100
         return 0.0
 
-class RevenueExport(BaseModel):
+class RevenueExport(RevenueBase):
+    """
+    Schema for exporting revenue data with flattened Account and Delivery Unit names.
+    """
+    id: UUID
     project_id: UUID = Field(..., description="Foreign key linking to the Project.")
-    project_name: str = Field(..., description="The project name.")
-    account_name : str = Field(..., description="The account name.")
-    delivery_unit_name: str = Field(..., description="Delivery unit name.")
-    expected_revenue: Optional[float] = 0.0
-    ytd_revenue: Optional[float] = 0.0
-    ai_direct_revenue: Optional[float] = 0.0
-    ai_direct_people: Optional[int] = 0
-    ai_assisted_people: Optional[int] = 0
-    ai_assisted_revenue: Optional[float] = 0.0
-    from_date: Optional[datetime] = None
-    to_date: Optional[datetime] = None
-    status: Optional[str] = "active"
-    total_ai_revenue: Optional[float] = 0.0
-    total_revenue: Optional[float] = 0.0
-    collection_date: Optional[datetime] = None
+    
+    # We allow this to be None initially, then populate it via validator
+    project_name: Optional[str] = Field(default=None, description="The project name.")
+
+    # 1. THE BRIDGE: Capture the nested Project data (Hidden from JSON output)
+    # This reads the 'project' relationship from the database result.
+    project_data: Optional[ProjectOut_Export] = Field(default=None, alias="project", exclude=True)
+
+    # 2. COMPUTED FIELDS: Extract names from the bridge
+    @computed_field
+    @property
+    def account_name(self) -> Optional[str]:
+        # Path: Revenue -> Project -> Account -> Name
+        if self.project_data and self.project_data.account:
+            return self.project_data.account.name
+        return None
+
+    @computed_field
+    @property
+    def delivery_unit_name(self) -> Optional[str]:
+        # Path: Revenue -> Project -> DeliveryUnit -> Name
+        if self.project_data and self.project_data.delivery_unit:
+            return self.project_data.delivery_unit.name
+        return None
+
+    # @computed_field
+    # @property
+    # def ai_penetration(self) -> float:
+    #     total_rev = self.total_revenue or 0.0
+    #     ai_rev = self.total_ai_revenue or 0.0
+    #     if total_rev > 0 and ai_rev > 0:
+    #         return (ai_rev / total_rev) * 100  
+    #     return 0.0
+
+    # 3. POPULATE NAMES: Ensure project_name is filled
+    @model_validator(mode='after')
+    def populate_names(self):
+        if self.project_data:
+            self.project_name = self.project_data.name
+        return self
+
+    # 4. NAN HANDLING
+    @field_validator(
+        'expected_revenue', 
+        'ytd_revenue', 
+        'ai_direct_revenue', 
+        'ai_assisted_revenue', 
+        'total_ai_revenue', 
+        'total_revenue', 
+        check_fields=False,
+        mode='before'
+    )
+    @classmethod
+    def sanitize_nan(cls, v):
+        if v is None:
+            return 0.0
+        try:
+            float_val = float(v)
+            if math.isnan(float_val) or math.isinf(float_val):
+                return 0.0
+            return float_val
+        except (TypeError, ValueError):
+            return 0.0
+
+    class Config:
+        from_attributes = True
