@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from backend.app.api import account as account_api 
 from backend.app.api import delivery_unit as delivery_unit_api
@@ -10,7 +11,8 @@ from backend.app.api import export_data as export_api
 from backend.app.api import dashboard as dashboard_api
 from backend.app.db.base import Base  
 from backend.app.db.session import engine
-
+from backend.app.api import simple_docs as docs_api
+from pathlib import Path
 
 app = FastAPI(
     title="AI Insight Platform API",
@@ -26,7 +28,22 @@ app.include_router(dashboard_api.router, prefix="/v1")
 # app.include_router(sow_extractor_api.router,  prefix="/v1")
 app.include_router(export_api.router, prefix="/v1")
 # app.include_router(sow_api.router,  prefix="/v1")
+BACKEND_DIR = Path(__file__).resolve().parent.parent
 
+# Construct the target path
+DOCS_DIR = BACKEND_DIR / "uploaded_docs" / "project_docs"
+
+# 2. Fix: Create the directory if it doesn't exist (prevents the RuntimeError)
+DOCS_DIR.mkdir(parents=True, exist_ok=True)
+
+# 3. Mount the StaticFiles
+# Access files via: http://localhost:8000/static_docs/filename.pdf
+app.mount("/static_docs", StaticFiles(directory=DOCS_DIR), name="static_docs")
+
+# (Optional) Print to console to verify the path when server starts
+print(f"Serving files from: {DOCS_DIR}")
+
+app.include_router(docs_api.router, prefix="/v1")
 # Call the function to initialize tables. 
 # init_db()
 

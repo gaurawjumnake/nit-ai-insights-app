@@ -2142,3 +2142,19 @@ WHERE true GROUP BY projects.id, projects.name, projects.account_id, accounts.na
 2025-12-17 18:16:39 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
 2025-12-17 18:33:38 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
 2025-12-17 22:03:49 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-18 14:27:45 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-18 14:56:25 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-18 23:01:14 | ERROR    | contextlib:__exit__ | Error while connecting db- [{'type': 'missing', 'loc': ('body', 'file'), 'msg': 'Field required', 'input': None}]
+2025-12-18 23:01:14 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-18 23:08:48 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-18 23:32:48 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-18 23:40:37 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-18 23:44:39 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-19 00:03:49 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-19 00:12:15 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-19 00:20:30 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-19 00:27:43 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-19 00:36:42 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-19 00:52:20 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-19 01:06:44 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
+2025-12-19 01:24:22 | DEBUG    | contextlib:__exit__ | Closeing DB Connection
