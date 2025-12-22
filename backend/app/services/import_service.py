@@ -412,7 +412,7 @@ class ImportProjectData:
 
         df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
         print(f"Columns: {list(df.columns)}")
-# ---
+# ----
         raw_cols = [c.strip().lower().replace(" ", "_") for c in df.columns]
 
         ALIASES={
@@ -474,7 +474,7 @@ class ImportProjectData:
         else:
             print("⚠ WARNING: Could not find 'delivery_unit' column to normalize.")
 
-# ---
+# ----
         required = {"project_name", "account_name"}
         if not required.issubset(set(df.columns)):
             missing = required - set(df.columns)
