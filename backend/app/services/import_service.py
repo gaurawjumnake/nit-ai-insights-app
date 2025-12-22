@@ -46,35 +46,7 @@ class ImportProjectData:
         if isinstance(value, float) and pd.isna(value):
             return ""
         return str(value).strip() if value is not None else ""
-    
-    # def _normalize_du_name(self, name: str) -> str:
-    #     """
-    #     Normalize delivery unit name to standard form like 'DU1', 'DU2', or 'DU3'.
-    #     Only allows DU1, DU2, DU3. 
-    #     Returns empty string if invalid.
-    #     """
-    #     if not name or not isinstance(name, str):
-    #         return ""
 
-    #     original = name.strip()
-
-    #     # Extract the first sequence of digits
-    #     match = re.search(r'\d+', original)
-    #     if match:
-    #         num_str = match.group(0)
-    #         if num_str in {'1', '2', '3'}:  # Only allow 1, 2, or 3
-    #             return f"DU{num_str}"
-    #         else:
-    #             print(f"⚠ Invalid delivery unit number '{num_str}' in '{original}'. Must be 1, 2, or 3.")
-    #             return ""  # Invalid number
-    #     else:
-    #         # No number found — check if it's a known text variation without number (unlikely, but safe)
-    #         cleaned = original.upper().replace(" ", "").replace("-", "")
-    #         if cleaned in {"DU1", "DU2", "DU3"}:
-    #             return cleaned
-    #         else:
-    #             print(f"⚠ No valid delivery unit number found in '{original}'. Must contain 1, 2, or 3.")
-    #             return ""
 
     def _get_or_create_delivery_unit(self, db: Session, row: Dict[str, Any]) -> Optional[DeliveryUnit]:
         """Get or create delivery unit from department name."""
@@ -440,7 +412,7 @@ class ImportProjectData:
 
         df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
         print(f"Columns: {list(df.columns)}")
-
+# ---
         raw_cols = [c.strip().lower().replace(" ", "_") for c in df.columns]
 
         ALIASES={
@@ -470,35 +442,7 @@ class ImportProjectData:
         
         df.rename(columns=canonical_cols,inplace=True)
 
-        # def normalize_du_value(text):
-        #     if not isinstance(text, str):
-        #         return text
-            
-        #     # Clean the input: remove whitespace, handle case if needed
-        #     clean_text = text.strip() 
-            
-        #     # Map of Valid Variations -> Target DU
-        #     # Key = Target, Value = List of variations
-        #     mapping = {
-        #         'DU1': ["DU-1", "Delivery Unit 1", "delivery_unit 1", "DU1","delivery unit 1"],
-        #         'DU2': ["DU-2", "Delivery Unit 2", "delivery_unit 2", "DU2","delivery unit 2"],
-        #         'DU3': ["DU-3", "Delivery Unit 3", "delivery_unit 3", "DU3","delivery unit 3"]
-        #     }
 
-        #     for target, variations in mapping.items():
-        #         # Case-insensitive check
-        #         if any(v.lower() == clean_text.lower() for v in variations):
-        #             return target
-            
-        #     return clean_text
-
-        # # Check if the column exists (it should now, if renaming worked)
-        # if "delivery_unit_name" in df.columns:
-        #     print("Processing Delivery Unit Normalization...")
-        #     # Convert column to string to avoid float errors, strip whitespace
-        #     df["delivery_unit_name"] = df["delivery_unit_name"].astype(str).apply(normalize_du_value)
-        # else:
-        #     print("WARNING: 'delivery_unit_name' column not found after renaming!")
         def normalize_du_value(text):
             if not isinstance(text, (str, int, float)):
                 return text
@@ -530,7 +474,7 @@ class ImportProjectData:
         else:
             print("⚠ WARNING: Could not find 'delivery_unit' column to normalize.")
 
-
+# ---
         required = {"project_name", "account_name"}
         if not required.issubset(set(df.columns)):
             missing = required - set(df.columns)
