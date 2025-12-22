@@ -1,4 +1,4 @@
-import io
+import io,re
 import pandas as pd
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
@@ -411,7 +411,69 @@ class ImportProjectData:
 
         df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
         print(f"Columns: {list(df.columns)}")
+# ---
+        raw_cols = [c.strip().lower().replace(" ", "_") for c in df.columns]
 
+        ALIASES={
+            "project_name": ["project_name", "project", "project_n", "project name","Project Name"],
+            "account_name": ["account_name","account","account_n","account name","Account Name"],
+            "start_date": ["start date","Start date"],
+            "end_date": ["end date"," End date"],
+            "delivery_unit_name": ["department","Delivery Unit","delivery unit","delivery_unit"],
+            "account_manager": ["Account Manager","Account manager"],
+            "status": ["Status"],
+            "project_type": ["Project Type","Project type"]
+        }
+
+        canonical_cols = {}
+        for col in raw_cols:
+            matched = False
+            for canonical, aliases in ALIASES.items():
+                for alias in aliases:
+                    if col == alias or col.startswith(alias):
+                        canonical_cols[col] = canonical
+                        matched = True
+                        break
+                if matched:
+                    break
+            if not matched:
+                canonical_cols[col] = col
+        
+        df.rename(columns=canonical_cols,inplace=True)
+
+
+        def normalize_du_value(text):
+            if not isinstance(text, (str, int, float)):
+                return text
+            
+            clean_text = str(text).strip()
+            
+            # --- REGEX EXPLANATION ---
+            # (?:du|unit|dept) : Look for 'du', 'unit', or 'dept'
+            # [\W_]*           : Followed by ANY amount of junk (spaces, dashes, underscores)
+            # 1                : Followed by the number
+            
+            # Covers: "Delivery Unit - 1", "delivery_unit_1", "DU1", "du - 1"
+            if re.search(r'(?:du|unit|dept)[\W_]*1', clean_text, re.IGNORECASE):
+                return 'DU1'
+            
+            # Covers: "delivery_unit_2", "du2", "Delivery Unit - 2"
+            if re.search(r'(?:du|unit|dept)[\W_]*2', clean_text, re.IGNORECASE):
+                return 'DU2'
+            
+            # Covers: "Delivery Unit 3", "du-3", "delivery_unit - 3"
+            if re.search(r'(?:du|unit|dept)[\W_]*3', clean_text, re.IGNORECASE):
+                return 'DU3'
+                
+            return clean_text
+        
+        if "delivery_unit_name" in df.columns:
+            print("✓ Processing Delivery Unit Normalization...")
+            df["delivery_unit_name"] = df["delivery_unit_name"].apply(normalize_du_value)
+        else:
+            print("⚠ WARNING: Could not find 'delivery_unit' column to normalize.")
+
+# ---
         required = {"project_name", "account_name"}
         if not required.issubset(set(df.columns)):
             missing = required - set(df.columns)
