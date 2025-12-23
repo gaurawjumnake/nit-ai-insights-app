@@ -17,3 +17,5 @@ chroma_db_*
 *.sqlite3
 *.dbs
 *.pickle
+app.log
+*.log
