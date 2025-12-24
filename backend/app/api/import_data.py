@@ -13,11 +13,12 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 load_dotenv(PROJECT_ROOT / "backend" / ".env")
 
-DEFAULT_TEMP_DIR = PROJECT_ROOT / "temp"
+DEFAULT_TEMP_DIR = PROJECT_ROOT / "backend" / "temp"
 TEMP_DIR = Path(os.getenv("TEMP_DIR") or DEFAULT_TEMP_DIR)
-PROJECT_SUCCESS_DIR = Path(os.getenv("PROJECT_SUCCESS_DIR") or DEFAULT_TEMP_DIR / "success")
+UPLOAD_BASE = PROJECT_ROOT / "backend" / "uploaded_docs"
+PROJECT_SUCCESS_DIR = UPLOAD_BASE / "app_docs" / "pmo"
 PROJECT_FAILED_DIR = Path(os.getenv("PROJECT_FAILED_DIR") or DEFAULT_TEMP_DIR / "failed")
-REVENUE_SUCCESS_DIR = Path(os.getenv("REVENUE_SUCCESS_DIR") or DEFAULT_TEMP_DIR / "revenue_success")
+REVENUE_SUCCESS_DIR = UPLOAD_BASE / "app_docs" / "revenue"
 REVENUE_FAILED_DIR = Path(os.getenv("REVENUE_FAILED_DIR") or DEFAULT_TEMP_DIR / "revenue_failed")
 
 for path in [TEMP_DIR, PROJECT_SUCCESS_DIR, PROJECT_FAILED_DIR, REVENUE_SUCCESS_DIR, REVENUE_FAILED_DIR]:

@@ -196,6 +196,18 @@ def get_account(db: Session, account_id: UUID) -> Optional[Account]:
         account.total_revenue = _safe_float(metrics.total_revenue)
         account.ai_revenue = _safe_float(metrics.ai_revenue)
         account.ai_penetration_pct = _safe_float(metrics.ai_penetration_pct)
+
+        if account.projects and account.ai_revenue == 0:
+            calc_ai_rev = sum(getattr(p, 'total_ai_revenue', 0.0) for p in account.projects)
+            if calc_ai_rev > 0:
+                account.ai_revenue = calc_ai_rev
+                if account.total_revenue == 0:
+                    account.total_revenue = sum(getattr(p, 'total_revenue', 0.0) for p in account.projects)
+                
+                if account.total_revenue > 0:
+                    account.ai_penetration_pct = (account.ai_revenue / account.total_revenue) * 100
+                else:
+                    account.ai_penetration_pct = 0.0
     else:
         account.project_count = 0
         account.active_project_count = 0
@@ -217,7 +229,11 @@ def get_account(db: Session, account_id: UUID) -> Optional[Account]:
                 (p.ai_direct_hours or 0.0) + (p.ai_assist_hours or 0.0) 
                 for p in account.projects
             )
-    
+            account.ai_revenue = sum(getattr(p, 'total_ai_revenue', 0.0) for p in account.projects)
+            account.total_revenue = sum(getattr(p, 'total_revenue', 0.0) for p in account.projects)
+            if account.total_revenue > 0:
+                account.ai_penetration_pct = (account.ai_revenue / account.total_revenue) * 100
+
     return account
 
 
