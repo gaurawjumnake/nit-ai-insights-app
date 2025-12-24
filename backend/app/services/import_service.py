@@ -1,7 +1,7 @@
 import io,re
 import pandas as pd
 from sqlalchemy.orm import Session
-from sqlalchemy import or_
+from sqlalchemy import or_, text
 from uuid import uuid4
 import datetime
 from typing import Dict, Any, Optional, List
@@ -603,6 +603,11 @@ class ImportProjectData:
         if not dry_run:
             try:
                 db.commit()
+                try:
+                    db.execute(text("SELECT refresh_account_metrics_mv();"))
+                    db.commit()
+                except Exception as e:
+                    print(f"Warning: Failed to refresh metrics: {e}")
                 print("\nSuccessfully committed all changes")
             except Exception as e:
                 db.rollback()
@@ -805,7 +810,16 @@ class ImportRevenueData:
                 created_revenue += 1
 
         if not dry_run:
-            db.commit()
+            try:
+                db.commit()
+                try:
+                    db.execute(text("SELECT refresh_account_metrics_mv();"))
+                    db.commit()
+                except Exception as e:
+                    print(f"Warning: Failed to refresh metrics: {e}")
+            except Exception as e:
+                db.rollback()
+                print(f"✗ Final commit failed: {e}")
 
         return {
             "rows": len(df),

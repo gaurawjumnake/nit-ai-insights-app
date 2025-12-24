@@ -228,7 +228,7 @@ class MasterSummary:
                     P.to_date,
                     P.ai_direct_hours.label("total_ai_direct_hours"),
                     P.ai_assist_hours.label("total_ai_assist_hours"),
-
+                    R.collection_date,
                     func.coalesce(func.sum(R.expected_revenue), 0).label("total_expected_rev"),
                     func.coalesce(func.sum(R.ytd_revenue), 0).label("total_ytd_rev"),
                     func.coalesce(func.sum(R.ai_direct_revenue), 0).label("total_ai_rev"),
@@ -236,8 +236,8 @@ class MasterSummary:
                     func.coalesce(func.sum(R.total_revenue), 0).label("total_revenue"),
                     func.coalesce(func.max(R.ai_direct_people), 0).label("ai_direct_people"),
 
-                    func.min(R.collection_date).label("min_date"),
-                    func.max(R.collection_date).label("max_date"),
+                    # func.min(R.collection_date).label("min_date"),
+                    # func.max(R.collection_date).label("max_date"),
                 )
                 .join(A, P.account_id == A.id)
                 .join(D, A.delivery_unit_id == D.id)
@@ -245,15 +245,15 @@ class MasterSummary:
                 .filter(and_(*project_filters) if project_filters else True) # type:ignore
                 .group_by(P.id, P.name, P.account_id, A.name, D.name, P.status, 
                         P.project_type, P.from_date, P.to_date, P.ai_direct_hours, 
-                        P.ai_assist_hours)
+                        P.ai_assist_hours,R.collection_date)
                 .order_by(P.created_at.desc())
                 .all()
             )
 
             response = []
             for row in results:
-                month = row.min_date.month if row.min_date else None
-                year = row.min_date.year if row.min_date else None
+                month = row.collection_date.month if row.collection_date else None
+                year = row.collection_date.year if row.collection_date else None
                 
                 summary = ProjectSummary(
                     project_id=row.project_id,
@@ -274,8 +274,8 @@ class MasterSummary:
                     total_ai_assist_rev=self._safe_float(row.total_ai_assist_rev),
                     total_revenue=self._safe_float(row.total_revenue),
                     total_project_count=1,
-                    # month=month,
-                    # year=year,
+                    month=month,
+                    year=year,
                 )
                 response.append(summary)
 
