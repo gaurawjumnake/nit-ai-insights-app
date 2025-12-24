@@ -30,7 +30,8 @@ app.include_router(export_api.router, prefix="/v1")
 # app.include_router(sow_api.router,  prefix="/v1")
 
 # Define Paths
-BACKEND_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent
+BACKEND_DIR = BASE_DIR / "backend"
 PMO_DIR = BACKEND_DIR / "uploaded_docs" / "app_docs" / "pmo"
 REVENUE_DIR = BACKEND_DIR / "uploaded_docs" / "app_docs" / "revenue"
 
@@ -43,7 +44,7 @@ app.mount("/static_pmo", StaticFiles(directory=PMO_DIR), name="static_pmo")
 app.mount("/static_revenue", StaticFiles(directory=REVENUE_DIR), name="static_revenue")
 
 # Include the Router
-app.include_router(file_list_api.router, tags=["Project Documents"])
+app.include_router(file_list_api.router, prefix="/v1", tags=["Project Documents"])
 
 # Call the function to initialize tables. 
 # init_db()

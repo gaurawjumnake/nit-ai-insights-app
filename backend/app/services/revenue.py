@@ -100,7 +100,7 @@ def update_revenue(db: Session, revenue_id: UUID, revenue_data: RevenueUpdate) -
         
         # Recalculate total_ai_revenue if ai_revenue or ai_assisted_revenue changed
         if 'ai_direct_revenue' in update_data or 'ai_assisted_revenue' in update_data:
-            ai_direct = update_data.get('ai_direct_revenue', db_revenue.ai_revenue) or 0
+            ai_direct = update_data.get('ai_direct_revenue', db_revenue.ai_direct_revenue) or 0
             ai_assisted = update_data.get('ai_assisted_revenue', db_revenue.ai_assisted_revenue) or 0
             update_data['total_ai_revenue'] = ai_direct + ai_assisted
         
