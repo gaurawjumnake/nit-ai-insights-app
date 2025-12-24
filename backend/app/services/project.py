@@ -4,7 +4,6 @@ from uuid import UUID
 from uuid import UUID as _UUID
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import func, and_, extract, text
-
 from backend.utitlites.app_utilites import safe_float, safe_int
 from backend.app.models.project import Project
 from backend.app.models.account import Account
@@ -344,11 +343,11 @@ def get_projects(
             project_type=row.project_type or "",
             from_date=row.from_date,
             to_date=row.to_date,
-            total_expected_rev=float(row.total_expected_rev),
-            total_ytd_rev=float(row.total_ytd_rev),
-            total_ai_rev=float(row.total_ai_rev),
-            total_ai_assist_rev=float(row.total_ai_assist_rev),
-            total_revenue=float(row.total_revenue),
+            total_expected_rev=safe_float(row.total_expected_rev),
+            total_ytd_rev=safe_float(row.total_ytd_rev),
+            total_ai_rev=safe_float(row.total_ai_rev),
+            total_ai_assist_rev=safe_float(row.total_ai_assist_rev),
+            total_revenue=safe_float(row.total_revenue),
             total_project_count=1,
             month=int(row.month) if row.month else None,
             year=int(row.year) if row.year else None,
@@ -375,11 +374,11 @@ def get_project(db: Session, project_id: UUID) -> Optional[Project]:
     ).first()
     
     if revenue_data:
-        project.expected_revenue = float(revenue_data.expected_revenue or 0)
-        project.ytd_revenue = float(revenue_data.ytd_revenue or 0)
-        project.ai_revenue = float(revenue_data.ai_revenue or 0)
-        project.ai_assisted_revenue = float(revenue_data.ai_assisted_revenue or 0)
-        project.total_revenue = float(revenue_data.total_revenue or 0)
+        project.expected_revenue = safe_float(revenue_data.expected_revenue)
+        project.ytd_revenue = safe_float(revenue_data.ytd_revenue)
+        project.ai_revenue = safe_float(revenue_data.ai_revenue)
+        project.ai_assisted_revenue = safe_float(revenue_data.ai_assisted_revenue)
+        project.total_revenue = safe_float(revenue_data.total_revenue)
         project.total_ai_revenue = project.ai_revenue + project.ai_assisted_revenue
     else:
         project.expected_revenue = 0.0
@@ -390,7 +389,8 @@ def get_project(db: Session, project_id: UUID) -> Optional[Project]:
         project.total_ai_revenue = 0.0
 
     if project.total_revenue and project.total_revenue > 0:
-        project.ai_penetration = (project.total_ai_revenue / project.total_revenue) * 100
+        val = (project.total_ai_revenue / project.total_revenue) * 100
+        project.ai_penetration = safe_float(val)
     else:
         project.ai_penetration = 0.0
     
@@ -602,11 +602,11 @@ def get_top_revenue_projects(
             project_type=row.project_type or "",
             from_date=row.from_date,
             to_date=row.to_date,
-            total_expected_rev=float(row.total_expected_rev),
-            total_ytd_rev=float(row.total_ytd_rev),
-            total_ai_rev=float(row.total_ai_rev),
-            total_ai_assist_rev=float(row.total_ai_assist_rev),
-            total_revenue=float(row.total_revenue),
+            total_expected_rev=safe_float(row.total_expected_rev),
+            total_ytd_rev=safe_float(row.total_ytd_rev),
+            total_ai_rev=safe_float(row.total_ai_rev),
+            total_ai_assist_rev=safe_float(row.total_ai_assist_rev),
+            total_revenue=safe_float(row.total_revenue),
             total_project_count=1,
             month=int(row.month) if row.month else None,
             year=int(row.year) if row.year else None,
