@@ -3,23 +3,25 @@ from sqlalchemy import UUID
 from pathlib import Path
 from typing import Any, Optional
 from sqlalchemy.exc import IntegrityError
-from backend.doc_insighter.core.extraction_pipeline import ImportProcessProjectDocument
+from backend.doc_insighter.core.extraction_pipeline import ProcessProjectDocument
 from backend.doc_insighter.core.document_kpi_prompts import SOW
 from backend.doc_insighter.tools.app_logger import Logger
 from backend.app.models.document import ProjectDocument
 log = Logger()
 
-doc_processor = ImportProcessProjectDocument(SOW.prompt)
+doc_processor = ProcessProjectDocument(SOW.prompt)
 
-def get_project_document(db: Session, project_id: UUID) -> Optional[ProjectDocument]:
+def get_project_document(db: Session, project_id: UUID, document_type:str) -> Optional[ProjectDocument]:
     """Retrieve a single revenue record by ID."""
     return db.query(ProjectDocument).options(
         joinedload(ProjectDocument.project)
     ).filter(ProjectDocument.project_id == project_id).first()
 
-def process_sow(db: Session, file_path: Path, project_id: UUID, dry_run: bool = False) -> dict[str, Any]:
+def process_document(db: Session, file_path: Path, project_id: UUID, dry_run: bool = False) -> dict[str, Any]:
     """Process SOW document and return summary dict"""
     
+    document_type="SOW"
+
     if not file_path or not Path(file_path).exists():
         log.log_debug(f"File path not found - {file_path}")
         return {
@@ -42,11 +44,11 @@ def process_sow(db: Session, file_path: Path, project_id: UUID, dry_run: bool = 
         }
     
     try:
-        existing_doc = get_project_document(db, project_id)
+        existing_doc = get_project_document(db, project_id, document_type)
         
         if existing_doc:
             existing_doc.content = content # type:ignore
-            existing_doc.document_type = "SOW" # type:ignore
+            existing_doc.document_type = document_type # type:ignore
             doc_data = existing_doc
             operation = "updated"
             records_created = 0
@@ -54,7 +56,7 @@ def process_sow(db: Session, file_path: Path, project_id: UUID, dry_run: bool = 
             doc_data = ProjectDocument(
                 project_id=project_id,
                 content=content,
-                document_type="SOW"
+                document_type=document_type
             )
             db.add(doc_data)
             operation = "created"
@@ -71,7 +73,7 @@ def process_sow(db: Session, file_path: Path, project_id: UUID, dry_run: bool = 
             "records_created": records_created,
             "document_id": str(doc_data.id),
             "operation": operation,
-            "message": f"SOW document {operation} successfully"
+            "message": f"{document_type} document {operation} successfully"
         }
         
     except IntegrityError as e:
@@ -84,7 +86,7 @@ def process_sow(db: Session, file_path: Path, project_id: UUID, dry_run: bool = 
         }
     except Exception as e:
         db.rollback()
-        log.log_error(f"Unexpected error processing SOW: {e}")
+        log.log_error(f"Unexpected error processing {document_type}: {e}")
         return {
             "errors": [f"Processing error: {str(e)}"],
             "records_processed": 1,

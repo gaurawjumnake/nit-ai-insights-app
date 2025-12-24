@@ -411,7 +411,7 @@ class ImportProjectData:
 
         df.columns = [c.strip().lower().replace(" ", "_") for c in df.columns]
         print(f"Columns: {list(df.columns)}")
-# ---
+
         raw_cols = [c.strip().lower().replace(" ", "_") for c in df.columns]
 
         ALIASES={
@@ -441,19 +441,12 @@ class ImportProjectData:
         
         df.rename(columns=canonical_cols,inplace=True)
 
-
         def normalize_du_value(text):
             if not isinstance(text, (str, int, float)):
                 return text
             
             clean_text = str(text).strip()
-            
-            # --- REGEX EXPLANATION ---
-            # (?:du|unit|dept) : Look for 'du', 'unit', or 'dept'
-            # [\W_]*           : Followed by ANY amount of junk (spaces, dashes, underscores)
-            # 1                : Followed by the number
-            
-            # Covers: "Delivery Unit - 1", "delivery_unit_1", "DU1", "du - 1"
+
             if re.search(r'(?:du|unit|dept)[\W_]*1', clean_text, re.IGNORECASE):
                 return 'DU1'
             
@@ -471,9 +464,8 @@ class ImportProjectData:
             print("✓ Processing Delivery Unit Normalization...")
             df["delivery_unit_name"] = df["delivery_unit_name"].apply(normalize_du_value)
         else:
-            print("⚠ WARNING: Could not find 'delivery_unit' column to normalize.")
+            print("WARNING: Could not find 'delivery_unit' column to normalize.")
 
-# ---
         required = {"project_name", "account_name"}
         if not required.issubset(set(df.columns)):
             missing = required - set(df.columns)

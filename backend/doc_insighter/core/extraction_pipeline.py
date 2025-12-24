@@ -7,7 +7,7 @@ from backend.doc_insighter.tools.app_logger import Logger
 log = Logger()
 
 
-class ImportProcessProjectDocument:
+class ProcessProjectDocument:
     name = "SOW"
     def __init__(self, doc_specific_prompt) -> None:
         self.parser = LlamaCloudDocumentParser()

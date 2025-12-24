@@ -8,7 +8,7 @@ from uuid import UUID
 from backend.app.db.session import get_db
 from backend.app.schemas.document import ProjectDocumentOut
 from backend.utitlites.doc_importer import import_and_save_document
-from backend.doc_insighter.services.sow import process_sow, get_project_document
+from backend.doc_insighter.services.sow import process_document, get_project_document
 from backend.doc_insighter.tools.app_logger import Logger
 log = Logger()
 from dotenv import load_dotenv
@@ -88,7 +88,7 @@ async def import_sow_document(
             temp_dir=TEMP_DIR,
             success_dir=PROJECT_DOCUMENT_DIR,
             failed_dir=PROJECT_FAILED_DIR,
-            import_function=process_sow,
+            import_function=process_document,
             db=db,
             dry_run=dry_run,
             document_type="SOW"
