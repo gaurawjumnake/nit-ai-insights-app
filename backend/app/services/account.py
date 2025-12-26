@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session, joinedload, aliased
 from sqlalchemy import func, case, text, and_, or_
 from math import isfinite
 from typing import List, Optional
+from datetime import datetime
 import logging
 from uuid import UUID
 
@@ -446,23 +447,31 @@ def get_top_revenue_accounts(db: Session, limit: int = 10) -> List[Account]:
 
 def get_account_revenue_summary(
     db: Session,
+    account_name: Optional[str] = None,
+    project_name: Optional[str] = None,
     project_status: Optional[str] = None,
     project_type: Optional[str] = None,
     month: Optional[int] = None,
     year: Optional[int] = None,
+    start_date: Optional[datetime] = None,
+    end_date: Optional[datetime] = None,
     delivery_unit_name: Optional[str] = None,
     limit: Optional[int] = None,
     skip: int = 0
 ) -> List[AccountRevenueSummary]:
     """
     Get account-level revenue summary with all projects aggregated per account.
-    Filters by collection_date for month/year.
+    Filters by collection_date for month/year or date range.
     
     Args:
+        account_name: Filter by account name
+        project_name: Filter by project name
         project_status: Filter projects by status (e.g., "active")
         project_type: Filter projects by type
         month: Filter revenue by collection month (1-12)
         year: Filter revenue by collection year
+        start_date: Filter revenue from this date
+        end_date: Filter revenue to this date
         delivery_unit_name: Filter by delivery unit
         limit: Limit number of accounts returned
         skip: Number of accounts to skip (pagination)
@@ -477,11 +486,17 @@ def get_account_revenue_summary(
 
     project_filters = []
     
+    if account_name:
+        project_filters.append(A.name.ilike(f"%{account_name}%"))
+
+    if project_name:
+        project_filters.append(P.name.ilike(f"%{project_name}%"))
+
     if project_status:
-        project_filters.append(P.status == project_status)
+        project_filters.append(P.status.ilike(project_status))
     
     if project_type:
-        project_filters.append(P.project_type == project_type)
+        project_filters.append(P.project_type.ilike(project_type))
     
     if delivery_unit_name:
         project_filters.append(D.name.ilike(f"%{delivery_unit_name}%"))
@@ -493,6 +508,12 @@ def get_account_revenue_summary(
     
     if year:
         revenue_filters.append(func.extract('year', R.collection_date) == year)
+
+    if start_date:
+        revenue_filters.append(R.collection_date >= start_date)
+    
+    if end_date:
+        revenue_filters.append(R.collection_date <= end_date)
     
     project_filters_condition = and_(*project_filters) if project_filters else True
     revenue_filters_condition = and_(*revenue_filters)
