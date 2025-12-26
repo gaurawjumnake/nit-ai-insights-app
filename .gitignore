@@ -8,8 +8,6 @@ venv/
 *.bin
 *.csv
 *.pdf
-*.md
-*.txt
 *.png 
 *.jpg
 *.jpeg
