@@ -201,9 +201,9 @@ class MasterSummary:
         if project_name:
             project_filters.append(P.name.ilike(f"%{project_name}%"))
         if project_status:
-            project_filters.append(P.status == project_status)
+            project_filters.append(P.status.ilike(project_status))
         if project_type:
-            project_filters.append(P.project_type == project_type)
+            project_filters.append(P.project_type.ilike(project_type))
         if delivery_unit_name:
             project_filters.append(D.name.ilike(f"%{delivery_unit_name}%"))
 

@@ -49,10 +49,14 @@ async def get_data(db: Session = Depends(get_db) ,
 @router.get("/account_summary", response_model=List[AccountRevenueSummary])
 def get_account_revenue_summary_endpoint(
     db: Session = Depends(get_db),
+    account_name: Optional[str] = None,
+    project_name: Optional[str] = None,
     project_status: Optional[str] = None ,
     project_type: Optional[str] = None,
     month: Optional[int] = None, 
     year: Optional[int] = None, 
+    start_date: Optional[datetime] = None,
+    end_date: Optional[datetime] = None,
     delivery_unit_name: Optional[str] = None, 
     limit: Optional[int] = None, 
     skip: int = 0
@@ -63,10 +67,14 @@ def get_account_revenue_summary_endpoint(
     """
     return get_account_revenue_summary(
         db=db,
+        account_name=account_name,
+        project_name=project_name,
         project_status=project_status,
         project_type=project_type,
         month=month,
         year=year,
+        start_date=start_date,
+        end_date=end_date,
         delivery_unit_name=delivery_unit_name,
         limit=limit,
         skip=skip
