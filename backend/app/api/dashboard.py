@@ -29,7 +29,7 @@ async def get_data(db: Session = Depends(get_db) ,
     ):
     summary = MasterSummary()
     try:
-        response = summary.get_project_level_summary(db,
+        response = await summary.get_project_level_summary(db,
                                                     account_name,
                                                     project_name,
                                                     project_status,
@@ -49,6 +49,8 @@ async def get_data(db: Session = Depends(get_db) ,
 @router.get("/account_summary", response_model=List[AccountRevenueSummary])
 def get_account_revenue_summary_endpoint(
     db: Session = Depends(get_db),
+    project_name: Optional[str] = None, 
+    account_name: Optional[str] = None, 
     project_status: Optional[str] = None ,
     project_type: Optional[str] = None,
     month: Optional[int] = None, 
@@ -63,6 +65,8 @@ def get_account_revenue_summary_endpoint(
     """
     return get_account_revenue_summary(
         db=db,
+        project_name = project_name,
+        account_name = account_name,
         project_status=project_status,
         project_type=project_type,
         month=month,

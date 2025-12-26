@@ -10,6 +10,8 @@ from backend.app.models.account import Account
 from backend.app.models.revenue import RevenueMaster
 from backend.app.models.delivery_unit import DeliveryUnit
 from backend.app.schemas.project import ProjectCreate, ProjectUpdate, ProjectSummary
+from backend.doc_insighter.tools.app_logger import Logger
+log = Logger()
 
 
 def get_projects_2(db: Session, skip: int = 0, limit: int = 100) -> List[Project]:
@@ -22,9 +24,9 @@ def get_project_2(db: Session, project_id: UUID) -> Optional[Project]:
     return db.query(Project).options(joinedload(Project.account)).filter(Project.id == project_id).first()
 
 
-def get_projects_by_account_2(db: Session, account_id: UUID) -> List[Project]:
-    """Retrieve all projects for a specific account."""
-    return db.query(Project).filter(Project.account_id == account_id).all()
+# def get_projects_by_account_2(db: Session, account_id: UUID) -> List[Project]:
+#     """Retrieve all projects for a specific account."""
+#     return db.query(Project).filter(Project.account_id == account_id).all()
 
 
 def get_project_by_name_and_account_id(db: Session, project_name: str, account_id: UUID) -> Optional[Project]:
@@ -159,6 +161,7 @@ def create_project(db: Session, project_data: ProjectCreate) -> Project:
     try:
         db.execute(text("SELECT refresh_account_metrics_mv();"))
         db.commit()
+        log.log_info(f"Project created successfully - {project_data.name}")
     except Exception:
         db.rollback()
 
@@ -259,6 +262,7 @@ def delete_project(db: Session, project_id: UUID) -> bool:
         db.rollback()
 
     return True
+
 
 def get_projects(
     db: Session, 

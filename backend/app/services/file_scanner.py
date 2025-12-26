@@ -6,11 +6,6 @@ from pathlib import Path
 from typing import List, Dict, Any
 
 class AbstractDocScanner(ABC):
-    """
-    Abstract Base Class. 
-    Enforces that any scanner must accept a directory/mount_point 
-    and implement a 'scan' method.
-    """
     def __init__(self, directory: Path, mount_point: str):
         self.directory = directory
         self.mount_point = mount_point

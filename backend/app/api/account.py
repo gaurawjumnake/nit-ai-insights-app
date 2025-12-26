@@ -15,7 +15,7 @@ router = APIRouter(
 
 # ----------------- 1. GET: Retrieve All Accounts -----------------
 @router.get("/", response_model=List[AccountOut])
-def read_accounts(
+async def read_accounts(
     skip: int = 0, 
     limit: Optional[int] = None, 
     db: Session = Depends(get_db)
@@ -24,7 +24,7 @@ def read_accounts(
     Retrieve a list of all client accounts.
     Used for the main Accounts dashboard view.
     """
-    accounts = account_service.get_accounts(db, skip=skip, limit=limit)
+    accounts = await account_service.get_accounts(db, skip=skip, limit=limit)
     return accounts
 
 # ----------------- 2. POST: Create New Account -----------------

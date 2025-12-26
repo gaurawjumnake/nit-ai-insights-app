@@ -19,3 +19,5 @@ chroma_db_*
 *.pickle
 app.log
 *.log
+test_data/
+uploaded_docs/
