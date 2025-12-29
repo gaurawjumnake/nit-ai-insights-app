@@ -13,15 +13,12 @@ from backend.doc_insighter.tools.app_logger import Logger
 log = Logger()
 from dotenv import load_dotenv
 
-
-PROJECT_ROOT = Path(__file__).resolve().parents[3]
-load_dotenv(PROJECT_ROOT / "backend" / ".env")
+load_dotenv()
 supported_extensions = os.getenv("SUPPORTED_DOC_TYPE_EXTENSIONS")
 
-DEFAULT_TEMP_DIR = PROJECT_ROOT / "temp"
-TEMP_DIR = Path(os.getenv("TEMP_DIR") or DEFAULT_TEMP_DIR)
-PROJECT_DOCUMENT_DIR = Path(os.getenv("PROJECT_DOCUMENT_DIR") or DEFAULT_TEMP_DIR / "success")
-PROJECT_FAILED_DIR = Path(os.getenv("PROJECT_FAILED_DIR") or DEFAULT_TEMP_DIR / "failed")
+TEMP_DIR = Path(os.getenv("TEMP_DIR")) # type:ignore
+PROJECT_DOCUMENT_DIR = Path(os.getenv("PROJECT_DOCUMENT_DIR")) # type:ignore
+PROJECT_FAILED_DIR = Path(os.getenv("PROJECT_FAILED_DIR")) # type:ignore
 
 
 for path in [TEMP_DIR, PROJECT_DOCUMENT_DIR, PROJECT_FAILED_DIR]:
@@ -113,8 +110,9 @@ async def get_sow_document(
     Retrieve SOW document for a project.
     - project_id: UUID of the project
     """
+    document_type = "sow"
     try:
-        doc = get_project_document(db, project_id) # type:ignore
+        doc = get_project_document(db, project_id, document_type) # type:ignore
         
         if not doc:
             raise HTTPException(
@@ -139,7 +137,6 @@ async def get_sow_document(
             status_code=500,
             detail=f"Failed to retrieve document: {str(e)}"
         )
-
 
 @router.delete("/sow/{project_id}", response_model=None)
 async def delete_sow_document(

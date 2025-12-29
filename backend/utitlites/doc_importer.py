@@ -180,7 +180,7 @@ async def import_and_save_document(
         raise HTTPException(status_code=400, detail=f"Failed to read file: {str(e)}")
     
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    safe_filename = f"{timestamp}_{file.filename}_{document_type}"
+    safe_filename = f"{timestamp}_{document_type}_{file.filename}"
     temp_file_path = temp_dir / safe_filename
     
     try:
