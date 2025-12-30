@@ -3,6 +3,7 @@ from sqlalchemy import func, case, text, and_, or_
 from math import isfinite
 from typing import List, Optional
 from uuid import UUID
+from datetime import datetime
 
 from backend.utitlites.app_utilites import safe_float
 from backend.app.models.account import Account, AccountMetricsMV
@@ -31,8 +32,8 @@ async def get_accounts(db: Session, skip: int = 0, limit: Optional[int] = None) 
             D.name.label("du_name"),
             D.created_at.label("du_created_at"),
             func.count(func.distinct(P.id)).label("project_count"),
-            func.sum(case((P.status.ilike('active'), 1), else_=0)).label("active_project_count"),
-            func.sum(case((P.status.ilike('inactive'), 1), else_=0)).label("inactive_project_count"),
+            func.count(func.distinct(case((P.status.ilike('active'), P.id)))).label("active_project_count"),
+            func.count(func.distinct(case((P.status.ilike('inactive'), P.id)))).label("inactive_project_count"),
             func.coalesce(func.sum(P.ai_direct_hours + P.ai_assist_hours), 0).label("total_ai_hours"),
             func.coalesce(func.sum(R.total_revenue), 0).label("total_revenue"),
             func.coalesce(func.sum(R.ai_direct_revenue), 0).label("ai_direct_revenue"),
@@ -380,19 +381,23 @@ def get_account_revenue_summary(
     project_type: Optional[str] = None,
     month: Optional[int] = None,
     year: Optional[int] = None,
+    start_date: Optional[datetime] = None,
+    end_date: Optional[datetime] = None,
     delivery_unit_name: Optional[str] = None,
     limit : Optional[int] = None,
     skip : Optional[int] = None,
 ) -> List[AccountRevenueSummary]:
     """
     Get account-level revenue summary with all projects aggregated per account.
-    Filters by collection_date for month/year.
+    Filters by collection_date for month/year or start_date/end_date.
     
     Args:
         project_status: Filter projects by status (e.g., "active")
         project_type: Filter projects by type
         month: Filter revenue by collection month (1-12)
         year: Filter revenue by collection year
+        start_date: Filter revenue from this date
+        end_date: Filter revenue to this date
         delivery_unit_name: Filter by delivery unit
         limit: Limit number of accounts returned
         skip: Number of accounts to skip (pagination)
@@ -408,17 +413,17 @@ def get_account_revenue_summary(
     project_filters = []
 
     if project_name:
-        project_filters.append(P.name == project_name)
+        project_filters.append(P.name.ilike(f"%{project_name}%"))
     
     if account_name:
-        project_filters.append(A.name == account_name)
+        project_filters.append(A.name.ilike(f"%{account_name}%"))
     
     if project_status:
-        project_filters.append(P.status == project_status)
+        project_filters.append(P.status.ilike(f"%{project_status}%"))
     
     if project_type:
-        project_filters.append(P.project_type == project_type)
-    
+        project_filters.append(P.project_type.ilike(f"%{project_type}%"))
+
     if delivery_unit_name:
         project_filters.append(D.name.ilike(f"%{delivery_unit_name}%"))
 
@@ -429,6 +434,14 @@ def get_account_revenue_summary(
     
     if year:
         revenue_filters.append(func.extract('year', R.collection_date) == year)
+
+    if start_date:
+        log.log_info(f"Applying start_date filter: {start_date}")
+        revenue_filters.append(func.date(R.collection_date) >= start_date.date())
+    
+    if end_date:
+        log.log_info(f"Applying end_date filter: {end_date}")
+        revenue_filters.append(func.date(R.collection_date) <= end_date.date())
     
     project_filters_condition = and_(*project_filters) if project_filters else True
     revenue_filters_condition = and_(*revenue_filters)
@@ -440,11 +453,11 @@ def get_account_revenue_summary(
                 A.name.label("account_name"),
                 D.name.label("delivery_unit_name"),
                 func.count(func.distinct(P.id)).label("project_count"),
-                func.sum(
-                    case((P.status.ilike('active'), 1), else_=0)
+                func.count(func.distinct(
+                    case((P.status.ilike('active'), P.id)))
                 ).label("active_project_count"),
-                func.sum(
-                    case((P.status.ilike('inactive'), 1), else_=0)
+                func.count(func.distinct(
+                    case((P.status.ilike('inactive'), P.id)))
                 ).label("inactive_project_count"),
                 func.coalesce(func.sum(R.total_revenue), 0).label("total_revenue"),
                 func.coalesce(func.sum(R.ai_direct_revenue), 0).label("total_ai_direct_revenue"),
