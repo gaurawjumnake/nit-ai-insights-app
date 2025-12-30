@@ -201,9 +201,9 @@ class MasterSummary:
         if project_name:
             project_filters.append(P.name.ilike(f"%{project_name}%"))
         if project_status:
-            project_filters.append(P.status == project_status)
+            project_filters.append(P.status.ilike(f"%{project_status}%"))
         if project_type:
-            project_filters.append(P.project_type == project_type)
+            project_filters.append(P.project_type.ilike(f"%{project_type}%"))
         if delivery_unit_name:
             project_filters.append(D.name.ilike(f"%{delivery_unit_name}%"))
 
@@ -336,6 +336,11 @@ class MasterSummary:
             .outerjoin(D, A.delivery_unit_id == D.id)
             .filter(and_(*filters) if filters else True)  # type:ignore
         )
+
+        if start_date:
+            revenue_query = revenue_query.filter(R.collection_date >= start_date)
+        if end_date:
+            revenue_query = revenue_query.filter(R.collection_date <= end_date)
 
         total_accounts = db.query(Account).count()
         active_accounts = total_accounts
