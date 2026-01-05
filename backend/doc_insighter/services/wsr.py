@@ -4,29 +4,25 @@ from pathlib import Path
 from typing import Any, Optional
 from uuid import uuid4
 from sqlalchemy.exc import IntegrityError
-from datetime import datetime, timezone, timedelta
 from backend.doc_insighter.core.extraction_pipeline import ProcessProjectDocument
-from backend.doc_insighter.core.document_kpi_prompts import SOW
+from backend.doc_insighter.core.document_kpi_prompts import WSR
 from backend.doc_insighter.tools.app_logger import Logger
 from backend.app.models.document import ProjectDocument
 log = Logger()
 
-# IST timezone (UTC+5:30)
-IST = timezone(timedelta(hours=5, minutes=30))
-
-doc_processor = ProcessProjectDocument(SOW.prompt)
+doc_processor = ProcessProjectDocument(WSR.prompt)
 
 def get_project_document(db: Session, project_id: UUID, document_type:str) -> Optional[ProjectDocument]:
-    """Retrieve a single revenue record by ID."""
+    """Retrieve a single WSR document by project ID and document type."""
     return db.query(ProjectDocument).options(
         joinedload(ProjectDocument.project)
     ).filter(ProjectDocument.project_id == project_id,
              ProjectDocument.document_type.ilike(document_type.lower())).first()
 
 def process_document(db: Session, file_path: Path, project_id: UUID, dry_run: bool = False) -> dict[str, Any]:
-    """Process SOW document and return summary dict"""
+    """Process WSR document and return summary dict"""
     
-    document_type="SOW"
+    document_type="WSR"
 
     if not file_path or not Path(file_path).exists():
         log.log_debug(f"File path not found - {file_path}")
@@ -59,13 +55,11 @@ def process_document(db: Session, file_path: Path, project_id: UUID, dry_run: bo
             operation = "updated"
             records_created = 0
         else:
-            ist_time = datetime.now(IST).replace(tzinfo=None)
             doc_data = ProjectDocument(
                 id = uuid4(),
                 project_id=project_id,
                 content=content,
-                document_type=document_type,
-                created_at=ist_time
+                document_type=document_type
             )
             db.add(doc_data)
             operation = "created"
@@ -101,12 +95,3 @@ def process_document(db: Session, file_path: Path, project_id: UUID, dry_run: bo
             "records_processed": 1,
             "records_created": 0
         }
-
-
-# # for testing -------------------------------------
-# from backend.app.db.session import SessionLocal
-# file_path = Path("test_data/sample sow.pdf")
-# project_id ="01f2b09f-d1d5-4928-a1ce-fbf43661d485"
-# session = SessionLocal()
-# result = process_document(session, file_path, project_id) # type:ignore
-# print(result)

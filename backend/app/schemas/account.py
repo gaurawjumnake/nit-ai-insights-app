@@ -31,7 +31,7 @@ class DeliveryUnitOut(BaseModel):
 class AccountOut(AccountBase):
     id: UUID
     created_at: datetime
-    delivery_unit: DeliveryUnitOut
+    delivery_unit: Optional[DeliveryUnitOut] = None
     project_count: int
     total_revenue: float
     ai_revenue: float
