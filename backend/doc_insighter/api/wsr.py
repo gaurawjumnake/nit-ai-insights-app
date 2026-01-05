@@ -8,7 +8,7 @@ from uuid import UUID
 from backend.app.db.session import get_db
 from backend.app.schemas.document import ProjectDocumentOut
 from backend.utitlites.doc_importer import import_and_save_document
-from backend.doc_insighter.services.sow import process_document, get_project_document
+from backend.doc_insighter.services.wsr import process_document, get_project_document
 from backend.doc_insighter.tools.app_logger import Logger
 log = Logger()
 from dotenv import load_dotenv
@@ -41,15 +41,15 @@ class ImportResponse(BaseModel):
     operation: Optional[str] = None
     message: Optional[str] = None
 
-@router.post("/import_sow/{project_id}", response_model=ImportResponse)
-async def import_sow_document(
+@router.post("/import_wsr/{project_id}", response_model=ImportResponse)
+async def import_wsr_document(
     project_id: UUID,
     file: UploadFile = File(...),
     dry_run: bool = False,  
     db: Session = Depends(get_db)
 ):
     """
-    Import SOW (Statement of Work) document for a project.
+    Import WSR (Weekly Status Report) document for a project.
     
     - project_id: UUID of the project
     - file: Document file (PDF, DOCX, DOC, TXT)
@@ -88,36 +88,36 @@ async def import_sow_document(
             import_function=process_document,
             db=db,
             dry_run=dry_run,
-            document_type="SOW"
+            document_type="WSR"
         )
         return result
     
     except HTTPException:
         raise
     except Exception as e:
-        log.log_error(f"Unexpected error in import_sow_document: {e}")
+        log.log_error(f"Unexpected error in import_wsr_document: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Internal server error: {str(e)}"
         )
 
-@router.get("/sow/{project_id}", response_model=None)
-async def get_sow_document(
+@router.get("/wsr/{project_id}", response_model=None)
+async def get_wsr_document(
     project_id: UUID,
     db: Session = Depends(get_db)
 ):
     """
-    Retrieve SOW document for a project.
+    Retrieve WSR document for a project.
     - project_id: UUID of the project
     """
-    document_type = "sow"
+    document_type = "wsr"
     try:
         doc = get_project_document(db, project_id, document_type) # type:ignore
         
         if not doc:
             raise HTTPException(
                 status_code=404,
-                detail=f"No SOW document found for project {project_id}"
+                detail=f"No WSR document found for project {project_id}"
             )
         
         return {
@@ -125,46 +125,46 @@ async def get_sow_document(
             "project_id": str(doc.project_id),
             "content": doc.content,
             "document_type": doc.document_type,
-            "created_at": doc.created_at.isoformat()  if doc.created_at else None # type:ignore
+            "created_at": doc.created_at.isoformat() if doc.created_at else None # type:ignore
         }
     
     except HTTPException:
         raise
     
     except Exception as e:
-        log.log_error(f"Error retrieving SOW document: {e}")
+        log.log_error(f"Error retrieving WSR document: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to retrieve document: {str(e)}"
         )
 
-@router.delete("/sow/{project_id}", response_model=None)
-async def delete_sow_document(
+@router.delete("/wsr/{project_id}", response_model=None)
+async def delete_wsr_document(
     project_id: UUID,
     db: Session = Depends(get_db)
 ):
     """
-    Delete SOW document for a project.
+    Delete WSR document for a project.
     - project_id: UUID of the project
     Returns confirmation of deletion.
     """
-    document_type = "sow"
+    document_type = "wsr"
     try:
         doc = get_project_document(db, project_id, document_type) # type:ignore
         
         if not doc:
             raise HTTPException(
                 status_code=404,
-                detail=f"No SOW document found for project {project_id}"
+                detail=f"No WSR document found for project {project_id}"
             )
         
         db.delete(doc)
         db.commit()
         
-        log.log_info(f"SOW document deleted for project {project_id}")
+        log.log_info(f"WSR document deleted for project {project_id}")
         
         return {
-            "message": "SOW document deleted successfully",
+            "message": "WSR document deleted successfully",
             "document_id": str(doc.id),
             "project_id": str(project_id)
         }
@@ -174,9 +174,8 @@ async def delete_sow_document(
     
     except Exception as e:
         db.rollback()
-        log.log_error(f"Error deleting SOW document: {e}")
+        log.log_error(f"Error deleting WSR document: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to delete document: {str(e)}"
         )
-
