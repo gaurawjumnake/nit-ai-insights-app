@@ -16,9 +16,9 @@ from dotenv import load_dotenv
 load_dotenv()
 supported_extensions = os.getenv("SUPPORTED_DOC_TYPE_EXTENSIONS")
 
-TEMP_DIR = Path(os.getenv("TEMP_DIR", "backend/temp"))
-PROJECT_DOCUMENT_DIR = Path(os.getenv("PROJECT_DOCUMENT_DIR", "backend/uploaded_docs/project_docs"))
-PROJECT_FAILED_DIR = Path(os.getenv("PROJECT_FAILED_DIR", "backend/temp"))
+TEMP_DIR = Path(os.getenv("TEMP_DIR"))
+PROJECT_DOCUMENT_DIR = Path(os.getenv("PROJECT_DOCUMENT_DIR"))
+PROJECT_FAILED_DIR = Path(os.getenv("PROJECT_FAILED_DIR"))
 
 
 for path in [TEMP_DIR, PROJECT_DOCUMENT_DIR, PROJECT_FAILED_DIR]:
@@ -79,12 +79,18 @@ async def import_wsr_document(
         )
 
     try:
+        project_success_dir = PROJECT_DOCUMENT_DIR / str(project_id)
+        project_success_dir.mkdir(parents=True, exist_ok=True)
+        
+        project_failed_dir = PROJECT_FAILED_DIR / str(project_id)
+        project_failed_dir.mkdir(parents=True, exist_ok=True)
+        
         result = await import_and_save_document(
             file=file,
             project_id=project_id, # type:ignore
             temp_dir=TEMP_DIR,
-            success_dir=PROJECT_DOCUMENT_DIR,
-            failed_dir=PROJECT_FAILED_DIR,
+            success_dir=project_success_dir,
+            failed_dir=project_failed_dir,
             import_function=process_document,
             db=db,
             dry_run=dry_run,
@@ -110,7 +116,7 @@ async def get_wsr_document(
     Retrieve WSR document for a project.
     - project_id: UUID of the project
     """
-    document_type = "wsr"
+    document_type = "WSR"
     try:
         doc = get_project_document(db, project_id, document_type) # type:ignore
         
@@ -148,7 +154,7 @@ async def delete_wsr_document(
     - project_id: UUID of the project
     Returns confirmation of deletion.
     """
-    document_type = "wsr"
+    document_type = "WSR"
     try:
         doc = get_project_document(db, project_id, document_type) # type:ignore
         
