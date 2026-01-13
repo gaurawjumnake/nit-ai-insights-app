@@ -58,7 +58,7 @@ class ProjectFileScanner(AbstractDocScanner):
                 return []
 
         # Define allowed extensions
-        ALLOWED_EXTENSIONS = {'.xlsx', '.xls', '.csv'}
+        ALLOWED_EXTENSIONS = {'.xlsx', '.xls', '.csv', '.pdf'}
 
         # Iterate through the dynamic directory
         for path in self.directory.iterdir():
