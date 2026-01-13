@@ -1,36 +1,34 @@
 from fastapi import APIRouter, UploadFile, HTTPException, File, Depends
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, Dict, List
 from pathlib import Path
 import os
 from sqlalchemy.orm import Session
 from uuid import UUID
 from backend.app.db.session import get_db
-# Import the helper utility
-from backend.utitlites.doc_importer import import_and_save_document
-# Import the NEW service functions
-from backend.doc_insighter.services.codequality import process_code_quality_document, get_project_document
 from backend.doc_insighter.tools.app_logger import Logger
+from backend.utitlites.doc_importer import import_and_save_document
 from dotenv import load_dotenv
+from backend.doc_insighter.services.code_quality import process_code_quality_document, get_project_document
 
 log = Logger()
 load_dotenv()
 
-# Ensure these match your environment variables
 supported_extensions = os.getenv("SUPPORTED_DOC_TYPE_EXTENSIONS")
-# Note: For code quality, you might want to ensure .py, .js, .txt etc are in your .env supported list
 
-TEMP_DIR = Path(os.getenv("TEMP_DIR")) # type:ignore
-PROJECT_DOCUMENT_DIR = Path(os.getenv("PROJECT_DOCUMENT_DIR")) # type:ignore
-PROJECT_FAILED_DIR = Path(os.getenv("PROJECT_FAILED_DIR")) # type:ignore
+TEMP_DIR = Path(os.getenv("TEMP_DIR"))
+PROJECT_DOCUMENT_DIR = Path(os.getenv("PROJECT_DOCUMENT_DIR"))
+PROJECT_FAILED_DIR = Path(os.getenv("PROJECT_FAILED_DIR"))
 
-# Ensure directories exist
 for path in [TEMP_DIR, PROJECT_DOCUMENT_DIR, PROJECT_FAILED_DIR]:
     path.mkdir(parents=True, exist_ok=True)
 
+
 router = APIRouter(prefix="/document", tags=["Project-Documents"])
 
-# Reusing the response model pattern
+class InputRequest(BaseModel):
+    file_path: str
+
 class ImportResponse(BaseModel):
     errors: List[str] = []
     records_processed: int
@@ -50,18 +48,22 @@ async def import_code_quality_document(
     db: Session = Depends(get_db)
 ):
     """
-    Import a code file or document to generate a Code Quality Report.
+    Import Code Quality document/report for a project.
     
     - project_id: UUID of the project
-    - file: Code file (Python, JS, TXT, etc)
-    - dry_run: If True, generates report without saving to database
+    - file: Document file containing code or code analysis
+    - dry_run: If True, validates file without saving to database
+    
+    Returns import summary with document ID and operation status.
     """
     if not file.filename:
-        raise HTTPException(status_code=400, detail="No filename provided")
+        raise HTTPException(
+            status_code=400, 
+            detail="No filename provided"
+        )
 
     file_extension = Path(file.filename).suffix.lower()
-    
-    # Note: Ensure your SUPPORTED_DOC_TYPE_EXTENSIONS in .env includes code extensions like .py, .js
+     
     if file_extension not in supported_extensions: # type:ignore
         raise HTTPException(
             status_code=400, 
@@ -69,17 +71,32 @@ async def import_code_quality_document(
         )
 
     if not project_id:
-        raise HTTPException(status_code=400, detail="project_id is required")
+        raise HTTPException(
+            status_code=400, 
+            detail="project_id is required"
+        )
 
     try:
-        # Calls the shared importer but passes the CODE QUALITY specific processor
+        # --- NEW LOGIC START ---
+        # 1. Define the project-specific directory
+        # e.g. /var/www/project_docs/123e4567-e89b...
+        project_success_dir = PROJECT_DOCUMENT_DIR / str(project_id)
+        
+        # 2. Create the directory immediately
+        # This ensures the folder exists before the importer tries to save the file
+        project_success_dir.mkdir(parents=True, exist_ok=True)
+        
+        # (Optional) Do the same for failed directory if you want isolation there too
+        project_failed_dir = PROJECT_FAILED_DIR / str(project_id)
+        project_failed_dir.mkdir(parents=True, exist_ok=True)
+        # --- NEW LOGIC END ---
         result = await import_and_save_document(
             file=file,
             project_id=project_id, # type:ignore
             temp_dir=TEMP_DIR,
-            success_dir=PROJECT_DOCUMENT_DIR,
-            failed_dir=PROJECT_FAILED_DIR,
-            import_function=process_code_quality_document, # <--- Key change here
+            success_dir=project_success_dir,
+            failed_dir=project_failed_dir,
+            import_function=process_code_quality_document, # Uses the Code Quality service logic
             db=db,
             dry_run=dry_run,
             document_type="CODE_QUALITY"
@@ -96,21 +113,22 @@ async def import_code_quality_document(
         )
 
 @router.get("/code_quality/{project_id}", response_model=None)
-async def get_code_quality_report(
+async def get_code_quality_document(
     project_id: UUID,
     db: Session = Depends(get_db)
 ):
     """
-    Retrieve the Code Quality Report for a project.
+    Retrieve Code Quality document for a project.
+    - project_id: UUID of the project
     """
-    document_type = "CODE_QUALITY"
+    document_type = "code_quality"
     try:
         doc = get_project_document(db, project_id, document_type) # type:ignore
         
         if not doc:
             raise HTTPException(
                 status_code=404,
-                detail=f"No Code Quality report found for project {project_id}"
+                detail=f"No Code Quality document found for project {project_id}"
             )
         
         return {
@@ -123,6 +141,7 @@ async def get_code_quality_report(
     
     except HTTPException:
         raise
+    
     except Exception as e:
         log.log_error(f"Error retrieving Code Quality document: {e}")
         raise HTTPException(
@@ -131,39 +150,42 @@ async def get_code_quality_report(
         )
 
 @router.delete("/code_quality/{project_id}", response_model=None)
-async def delete_code_quality_report(
+async def delete_code_quality_document(
     project_id: UUID,
     db: Session = Depends(get_db)
 ):
     """
-    Delete the Code Quality Report for a project.
+    Delete Code Quality document for a project.
+    - project_id: UUID of the project
+    Returns confirmation of deletion.
     """
-    document_type = "CODE_QUALITY"
+    document_type = "code_quality"
     try:
         doc = get_project_document(db, project_id, document_type) # type:ignore
         
         if not doc:
             raise HTTPException(
                 status_code=404,
-                detail=f"No Code Quality report found for project {project_id}"
+                detail=f"No Code Quality document found for project {project_id}"
             )
         
         db.delete(doc)
         db.commit()
         
-        log.log_info(f"Code Quality report deleted for project {project_id}")
+        log.log_info(f"Code Quality document deleted for project {project_id}")
         
         return {
-            "message": "Code Quality report deleted successfully",
+            "message": "Code Quality document deleted successfully",
             "document_id": str(doc.id),
             "project_id": str(project_id)
         }
     
     except HTTPException:
         raise
+    
     except Exception as e:
         db.rollback()
-        log.log_error(f"Error deleting Code Quality report: {e}")
+        log.log_error(f"Error deleting Code Quality document: {e}")
         raise HTTPException(
             status_code=500,
             detail=f"Failed to delete document: {str(e)}"

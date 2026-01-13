@@ -400,18 +400,18 @@ class ImportProjectData:
                         elif revenue_action == "updated":
                             updated_revenue_records += 1
 
-                        doc_result = self._get_or_create_project_document(
-                            db, existing_project, row  # type:ignore
-                        )
-                        if doc_result:
-                            existing_doc_check = db.query(ProjectDocument).filter(
-                                ProjectDocument.id == doc_result.id,
-                                ProjectDocument.created_at >= datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(seconds=5)
-                            ).first()
-                            if existing_doc_check:
-                                created_documents += 1
-                            else:
-                                updated_documents += 1
+                        # doc_result = self._get_or_create_project_document(
+                        #     db, existing_project, row  # type:ignore
+                        # )
+                        # if doc_result:
+                        #     existing_doc_check = db.query(ProjectDocument).filter(
+                        #         ProjectDocument.id == doc_result.id,
+                        #         ProjectDocument.created_at >= datetime.datetime.now(datetime.timezone.utc) - datetime.timedelta(seconds=5)
+                        #     ).first()
+                        #     if existing_doc_check:
+                        #         created_documents += 1
+                        #     else:
+                        #         updated_documents += 1
                     
                     updated_projects += 1
                 else:
@@ -438,11 +438,11 @@ class ImportProjectData:
                         elif revenue_action == "updated":
                             updated_revenue_records += 1
 
-                        doc_result = self._get_or_create_project_document(
-                            db, new_project, row  # type:ignore
-                        )
-                        if doc_result:
-                            created_documents += 1
+                        # doc_result = self._get_or_create_project_document(
+                        #     db, new_project, row  # type:ignore
+                        # )
+                        # if doc_result:
+                        #     created_documents += 1
                     
                     created_projects += 1
 
@@ -477,8 +477,8 @@ class ImportProjectData:
             "updated_projects": updated_projects,
             "created_revenue_records": created_revenue_records,
             "updated_revenue_records": updated_revenue_records,
-            "created_documents": created_documents,
-            "updated_documents": updated_documents,
+            # "created_documents": created_documents,
+            # "updated_documents": updated_documents,
             "skipped_rows": skipped_rows,
             "errors": errors,
             "expected_columns": self.EXPECTED_COLUMNS,
