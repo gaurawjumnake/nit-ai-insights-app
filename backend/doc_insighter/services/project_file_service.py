@@ -60,7 +60,22 @@ class ProjectFileService:
             print(f"Error scanning directory {project_dir}: {e}")
             return []
 
-        # Sort by Newest First
         files_list.sort(key=lambda x: x['upload_date'], reverse=True)
 
         return files_list
+
+    @staticmethod
+    def delete_project_file(project_id: str, filename: str) -> bool:
+        project_dir = PROJECT_DOCUMENT_DIR / str(project_id)
+        if not project_dir.exists():
+            return False
+            
+        file_path = project_dir / filename
+        if file_path.exists() and file_path.is_file():
+            try:
+                os.remove(file_path)
+                return True
+            except Exception as e:
+                print(f"Error deleting file {file_path}: {e}")
+                return False
+        return False
