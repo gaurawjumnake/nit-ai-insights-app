@@ -21,6 +21,8 @@ class ProjectBase(BaseModel):
     proposal_end_date: Optional[datetime] = None
     expected_win_date: Optional[datetime] = None
     expected_outcome: Optional[str] = None
+    technical_roadmap: Optional[str] = None
+    product_roadmap: Optional[str] = None
     code_coverage_pct: Optional[float] = 0.0
 
 
@@ -50,6 +52,8 @@ class ProjectUpdate(BaseModel):
     proposal_end_date: Optional[datetime] = None
     expected_win_date: Optional[datetime] = None
     expected_outcome: Optional[str] = None
+    technical_roadmap: Optional[str] = None
+    product_roadmap: Optional[str] = None
     code_coverage_pct: Optional[float] = None
     expected_revenue: Optional[float] = None
     ytd_revenue: Optional[float] = None
@@ -196,6 +200,8 @@ class ProjectExport(ProjectBase):
     proposal_end_date: Optional[datetime] = None
     expected_win_date: Optional[datetime] = None
     expected_outcome: Optional[str] = None
+    technical_roadmap: Optional[str] = None
+    product_roadmap: Optional[str] = None
     code_coverage_pct: Optional[float] = 0.0
     class Config:
         from_attributes = True

@@ -26,6 +26,8 @@ class Project(Base):
     proposal_end_date = Column(DateTime)
     expected_win_date = Column(DateTime)
     expected_outcome = Column(Text)
+    technical_roadmap = Column(Text)
+    product_roadmap = Column(Text)
     code_coverage_pct = Column(Float, default=0.0)
     created_at = Column(DateTime, default=datetime.utcnow)
     

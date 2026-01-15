@@ -128,6 +128,15 @@ def get_account(db: Session, account_id: UUID) -> Optional[Account]:
                 project.ai_assisted_revenue = 0.0
                 project.total_ai_revenue = 0.0
                 project.total_revenue = 0.0
+        
+        account.projects = sorted(
+            account.projects,
+            key=lambda p: (
+                getattr(p, 'total_revenue', 0) > 0, 
+                getattr(p, 'total_revenue', 0)       
+            ),
+            reverse=True
+        )
 
     if metrics:
         account.project_count = metrics.project_count or 0
